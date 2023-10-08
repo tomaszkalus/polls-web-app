@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% set active_page = "new_poll" %}
+
+{% block content %}
+<p class="fs-1">Create a new poll</p>
+
+<form action="{{ url_for('polls.create_poll') }}" method="post">
+    <label for="poll-title-input">Poll title:</label>
+    <input class="form-control mb-3" type="text" name="poll-title" id="poll-title-input"
+        placeholder="Eg. What's your favourite food?">
+
+    {% raw %}
+    <div id="answers-editor">
+        <div id="answers-container">
+            <div v-for="(answer, index) in pollAnswers">
+                <poll-answer-input v-model="answer.text" :id="index" :removable="answer.isRemovable"
+                    @remove-answer="removeAnswer"></poll-answer-input>
+
+            </div>
+        </div>
+
+        <div>
+            <div class="mb-2">
+                <input class="form-check-input me-2" type="checkbox" id="poll-is-expired" value="true" name="poll-is-expired" v-model="isExpirationEnabled">
+                <label class="form-check-label" for="poll-is-expired">
+                    Make the poll expired at certain date
+                </label>
+            </div>
+
+            <div>
+                <label for="poll-expiration-date-input">Expiration date:</label>
+                <input :disabled="!isExpirationEnabled" class="form-control" name="poll-expiration-date" type="datetime-local" :value="defaultDate" id="poll-expiration-date-input">
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-5">
+            <button type="button" @click="addAnswer" class="btn btn-primary px-5 me-5" id="add-new-answer-btn">Add new
+                question</button>
+            <button type="submit" class="btn btn-primary px-5">Create a new poll</button>
+        </div>
+
+
+    </div>
+    {% endraw %}
+
+
+</form>
+
+<script type="module" src="{{url_for('static', filename='pollAnswerInput.js')}}"></script>
+<script type="module" src="{{url_for('static', filename='createPoll.js')}}"></script>
+
+{% endblock %}
