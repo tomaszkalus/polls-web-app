@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<p class="fw-bold fs-3">{{ poll.name }}</p>
+
+<form method="post">
+    {% for answer in poll.answers %}
+    <div class="form-check poll-answers">
+        <input class="form-check-input" type="radio" name="poll-answer" id="answer-{{ loop.index }}" data-answer_id="{{ loop.index }}" value="{{ loop.index }}">
+        <label class="form-check-label" for="answer-{{ loop.index }}">
+            {{ answer.text }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary px-5 mt-3">Vote</button>
+</form>
+
+<script>
+    document.querySelector('#answer-1').checked = true;
+</script>
+
+{% endblock %}

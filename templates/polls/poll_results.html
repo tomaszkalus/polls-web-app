@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<p class="fw-bold fs-3">{{ poll.name }}</p>
+
+<div>
+{% for answer in poll.answers %}
+    <p id="answer-{{ loop.index }}">{{ answer.text }} - {{ answer.number_of_votes }}</p>
+{% endfor %}
+</div>
+
+
+
+{% endblock %}
