@@ -28,11 +28,34 @@ class User(UserMixin, db.Model):
     email: Mapped[str] = mapped_column(db.String(254), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(db.String(128), nullable=False)
     username: Mapped[str] = mapped_column(db.String(30), unique=True, nullable=False)
+    join_date: Mapped[datetime.date] = mapped_column(DateTime, default=datetime.date.today)
     polls: Mapped[List["Poll"]] = relationship(backref="user")
     voted_answers: Mapped[List["Answer"]] = relationship(
         secondary=users_answers_assoc, back_populates="users"
     )
-
+    @hybrid_property
+    def number_of_polls_created(self):
+        return len(self.polls)
+    
+    @number_of_polls_created.expression
+    def number_of_polls_created(cls):
+        return (
+            select([func.count(Poll.id)])
+            .where(Poll.user_id == cls.id)
+            .label("number_of_polls_created")
+        )
+    
+    @hybrid_property
+    def number_of_votes(self):
+        return len(self.voted_answers)
+    
+    @number_of_votes.expression
+    def number_of_votes(cls):
+        return (
+            select([func.count(users_answers_assoc.c.user_id)])
+            .where(users_answers_assoc.c.user_id == cls.id)
+            .label("number_of_votes")
+        )
 
 class Poll(db.Model):
     __tablename__ = "poll"

@@ -3,38 +3,47 @@
 
 {% block content %}
 
-
-<h1>Hello, {{ username }}</h1>
+<h1>Hello, {{ user.username }}</h1>
 
 <!-- Profile mockup: -->
 <div class=" w-50 my-5">
-    <p class="fw-bold">Profile statistics:</p>
+    <p class="fw-bold">Profile information:</p>
     <table class="table">
         <tr>
             <td>E-mail address</td>
-            <td>example@example.com</td>
+            <td>{{ user.email }}</td>
         </tr>
 
         <tr>
             <td>Joined:</td>
-            <td>05.01.2023</td>
+            <td>{{ user.join_date.strftime('%d.%m.%Y') }}</td>
         </tr>
 
         <tr>
             <td>Polls created:</td>
-            <td>10</td>
+            <td>{{ user.number_of_polls_created}}</td>
         </tr>
 
         <tr>
             <td>Vote count:</td>
-            <td>22</td>
+            <td>{{ user.number_of_votes }}</td>
         </tr>
 
     </table>
 </div>
+
+
+<div class="mb-5">
+    <h1>Your polls:</h1>
+    {% for poll in user.polls %}
+        <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
+    {% endfor %}
+    <div>
+
+    </div>
+</div>
+
 <button type="submit" class="btn btn-primary px-5">Change password</button>
 <button type="submit" class="btn btn-danger px-5">Delete account</button>
-
-
 
 {% endblock %}

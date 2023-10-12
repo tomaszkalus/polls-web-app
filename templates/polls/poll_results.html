@@ -4,10 +4,50 @@
 <p class="fw-bold fs-3">{{ poll.name }}</p>
 
 <div>
-{% for answer in poll.answers %}
+{% for answer in poll_answers %}
     <p id="answer-{{ loop.index }}">{{ answer.text }} - {{ answer.number_of_votes }}</p>
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: 25%"></div>
+    </div>
 {% endfor %}
 </div>
+
+<div>
+    <canvas id="poll-results"></canvas>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const poll_results = {{ poll_answers | tojson }};
+
+    const pollAnswers = poll_results.map(subList => subList[0]);
+    const pollVotes = poll_results.map(subList => subList[1]);
+
+    const ctx = document.getElementById('poll-results');
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+        labels: pollAnswers,
+        datasets: [{
+            label: '% of Votes',
+            data: pollVotes,
+            borderWidth: 1
+        }]
+        },
+        options: {
+        scales: {
+            y: {
+            beginAtZero: true
+            }
+        }
+        }
+    });
+
+</script>
+
 
 
 

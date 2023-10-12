@@ -45,7 +45,8 @@ def poll_vote(poll_id):
     # Show poll
     if request.method == "GET":
         if int(poll_id) in voted_poll_ids:
-            return render_template('poll_results.html', poll = poll)
+            poll_data = poll_answers_to_tuple(poll)
+            return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
         
         return render_template('poll.html', poll = poll)
     
@@ -62,6 +63,12 @@ def poll_vote(poll_id):
 
         flash("You've successfully voted in this poll! Here are the results:", 'success')
         return render_template('poll_results.html', poll = poll)
+    
+
+def poll_answers_to_tuple(poll):
+    return tuple([(answer.text, answer.number_of_votes) for answer in poll.answers])
+    
+
 
         
 

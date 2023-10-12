@@ -12,4 +12,4 @@ def home():
 @main.route("/profile")
 @login_required
 def profile():
-    return render_template("profile.html", username=current_user.username)
+    return render_template("profile.html", user=current_user)
