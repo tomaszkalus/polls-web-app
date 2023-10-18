@@ -56,17 +56,20 @@ def poll_vote(poll_id):
         voted_answer = poll.answers[voted_answer_index - 1]
 
         if int(poll_id) in voted_poll_ids:
-            return render_template('poll_results.html', poll = poll)
+            poll_data = poll_answers_to_tuple(poll)
+            return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
 
         current_user.voted_answers.append(voted_answer)
         db.session.commit()
 
+        poll_data = poll_answers_to_tuple(poll)
         flash("You've successfully voted in this poll! Here are the results:", 'success')
-        return render_template('poll_results.html', poll = poll)
+        return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
     
 
 def poll_answers_to_tuple(poll):
-    return tuple([(answer.text, answer.number_of_votes) for answer in poll.answers])
+    return tuple([(answer.text, answer.number_of_votes, answer.answer_percent) for answer in poll.answers])
+
     
 
 

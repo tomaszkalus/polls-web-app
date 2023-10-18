@@ -7,7 +7,8 @@
 
 <!-- Profile mockup: -->
 <div class=" w-50 my-5">
-    <p class="fw-bold">Profile information:</p>
+    <!-- <p class="fw-bold"></p> -->
+    <h4>Profile information:</h4>
     <table class="table">
         <tr>
             <td>E-mail address</td>
@@ -34,13 +35,34 @@
 
 
 <div class="mb-5">
-    <h1>Your polls:</h1>
-    {% for poll in user.polls %}
-        <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
-    {% endfor %}
-    <div>
+    <h4>Your polls:</h4>
+    <ul class="list-group">
+        {% for poll in user.polls %}
+        <li class="list-group-item">
+            <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a> <span>by {{poll.author.username}}</span>
+            <div class="mt-1">
+                <span class="me-3"><i class="fas fa-user me-2"></i>{{ poll.author.username }}</span>
+                <span><i class="fas fa-poll me-2"></i>{{ poll.total_number_of_votes }}</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
-    </div>
+<div class="mb-5">
+    <h4>Polls you've voted in:</h4>
+    <ul class="list-group">
+        {% for poll in user.voted_polls %}
+        <li class="list-group-item">
+            <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
+            <div class="mt-1">
+                <span class="me-3"><i class="fas fa-user me-2"></i>{{ poll.author.username }}</span>
+                <span><i class="fas fa-poll me-2"></i>{{ poll.total_number_of_votes }}</span>
+            </div>
+            <!-- <span class="mx-3">{{poll.total_number_of_votes}} votes total</span> -->
+        </li>
+        {% endfor %}
+    </ul>
 </div>
 
 <button type="submit" class="btn btn-primary px-5">Change password</button>

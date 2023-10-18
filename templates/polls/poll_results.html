@@ -2,37 +2,42 @@
 {% block content %}
 
 <p class="fw-bold fs-3">{{ poll.name }}</p>
+<p><i class="fas fa-poll"></i> {{ poll.total_number_of_votes }} votes</p>
 
-<div>
-{% for answer in poll_answers %}
-    <p id="answer-{{ loop.index }}">{{ answer.text }} - {{ answer.number_of_votes }}</p>
-    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" style="width: 25%"></div>
+<div class="mb-5">
+{% for answer in poll.answers %}
+    <p class="mb-2" id="answer-{{ loop.index }}">{{ answer.text }} - {{  answer.answer_percent }}% ({{answer.number_of_votes }} votes)</p>
+    <div class="progress mb-3" role="progressbar" style="height:20px">
+        <div class="progress-bar" style="width: {{answer.answer_percent}}%">{{answer.answer_percent}}%</div>
     </div>
 {% endfor %}
 </div>
 
-<div>
-    <canvas id="poll-results"></canvas>
+<div class="mt-5 d-flex justify-content-center">
+    <div class="w-50">
+        <canvas  id="poll-results"></canvas>
+    </div>
 </div>
 
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+
     const poll_results = {{ poll_answers | tojson }};
 
     const pollAnswers = poll_results.map(subList => subList[0]);
     const pollVotes = poll_results.map(subList => subList[1]);
+    const pollPercentages = poll_results.map(subList => subList[2]);
 
     const ctx = document.getElementById('poll-results');
 
-    new Chart(ctx, {
+    const chart = new Chart(ctx, {
         type: 'pie',
         data: {
         labels: pollAnswers,
         datasets: [{
-            label: '% of Votes',
+            label: '# of Votes',
             data: pollVotes,
             borderWidth: 1
         }]
@@ -45,6 +50,12 @@
         }
         }
     });
+
+    const chart_colors = chart.data.datasets[0].backgroundColor
+    const progressBars = document.querySelectorAll('.progress-bar');
+    for(let i = 0; i < progressBars.length; i++) {
+        progressBars[i].style.backgroundColor = chart_colors[i];
+    }
 
 </script>
 

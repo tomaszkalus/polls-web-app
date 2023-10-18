@@ -19,19 +19,7 @@
             </div>
         </div>
 
-        <div>
-            <div class="mb-2">
-                <input class="form-check-input me-2" type="checkbox" id="poll-is-expired" value="true" name="poll-is-expired" v-model="isExpirationEnabled">
-                <label class="form-check-label" for="poll-is-expired">
-                    Make the poll expired at certain date
-                </label>
-            </div>
-
-            <div>
-                <label for="poll-expiration-date-input">Expiration date:</label>
-                <input :disabled="!isExpirationEnabled" class="form-control" name="poll-expiration-date" type="datetime-local" :value="defaultDate" id="poll-expiration-date-input">
-            </div>
-        </div>
+    
 
         <div class="d-flex justify-content-center mt-5">
             <button type="button" @click="addAnswer" class="btn btn-primary px-5 me-5" id="add-new-answer-btn">Add new
