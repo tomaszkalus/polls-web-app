@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block page_title %}
+Polls - Delete Account
+{% endblock %}
+
+{% block content %}
+
+<p class="fs-1">Delete account</p>
+<p>Are you sure you want to remove your account? This operation is irreversible.</p>
+
+<form method="post">
+    <div class="d-flex justify-content-center">
+
+        <div class="mt-2">
+            <button type="button" class="btn btn-danger px-5 me-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Yes</button>
+            <a href="{{url_for('main.home')}}" class="btn btn-primary px-5">No, take me back to my profile</a>
+        </div>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Delete account confirmation</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="password" class="form-label">Enter your password to confirm:</label>
+                        <input class="form-control" type="password" name="password"><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Delete your account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</form>
+
+
+{% endblock %}

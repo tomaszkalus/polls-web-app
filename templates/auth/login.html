@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% set active_page = "login" %}
 
+{% block page_title %}
+Polls - Login
+{% endblock %}
+
 {% block content %}
 
 <form action="{{ url_for('auth.login')}}" method="post">

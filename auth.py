@@ -7,12 +7,18 @@ from flask import (
     current_app,
     flash,
 )
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User
-from flask_login import login_user, login_required, logout_user, login_manager
+from flask_login import (
+    login_user,
+    login_required,
+    logout_user,
+    login_manager,
+    current_user,
+)
 
 auth = Blueprint("auth", __name__, template_folder="templates/auth")
-
 app = current_app
 
 
@@ -53,7 +59,7 @@ def register_post():
     user = User.query.filter_by(email=email).first()
 
     if user:
-        flash("Email address already exists")
+        flash("A username with this email address already exists")
         return redirect(url_for("auth.register"))
 
     new_user = User(
@@ -76,3 +82,26 @@ def logout():
     logout_user()
     flash("You were successfully logged out", "success")
     return redirect(url_for("main.home"))
+
+
+@auth.route("/delete_account/", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    if request.method == "GET":
+        return render_template("delete_account.html")
+
+    if request.method == "POST":
+        password = request.form.get("password")
+
+        user = User.query.filter_by(id=current_user.id).first()
+
+        if not check_password_hash(user.password, password):
+            flash("The password you've provided is incorrect.", "danger")
+            return redirect(url_for("auth.delete_account"))
+
+        db = app.config["db"]
+        db.session.delete(user)
+        db.session.commit()
+
+        flash("Your account was successfully deleted", "success")
+        return redirect(url_for("main.home"))

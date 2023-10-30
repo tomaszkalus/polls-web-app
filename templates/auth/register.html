@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% set active_page = "register" %}
 
+{% block page_title %}
+Polls - Register
+{% endblock %}
+
 {% block content %}
 <p class="fs-1">Register</p>
 <form action="{{ url_for('auth.register')}}" method="post">

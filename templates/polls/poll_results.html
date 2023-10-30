@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block page_title %}
+Poll - {{ poll.name }}
+{% endblock %}
 {% block content %}
 
 <p class="fw-bold fs-3">{{ poll.name }}</p>
