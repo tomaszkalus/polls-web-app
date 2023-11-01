@@ -16,7 +16,7 @@ createApp({
 
         })();
 
-        const pollAnswersLimit = 10;
+        const pollAnswersLimit = 8;
         const pollAnswers = ref([{ text: '', isRemovable: false }, { text: '', isRemovable: false }]);
         const isExpirationEnabled = ref(false);
 

@@ -13,7 +13,7 @@ def create_app():
     app.config["SECRET_KEY"] = "secret-key-goes-here"
     app.config[
         "SQLALCHEMY_DATABASE_URI"
-    ] = f"mysql+pymysql://{db_username}:{db_password}@127.0.0.1/polls2"
+    ] = f"mysql+pymysql://{db_username}:{db_password}@127.0.0.1/polls"
     app.config["TEMPLATES_AUTO_RELOAD"] = True
 
     from polls_app.models import db

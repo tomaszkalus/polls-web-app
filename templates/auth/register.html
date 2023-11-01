@@ -8,19 +8,20 @@ Polls - Register
 {% block content %}
 <p class="fs-1">Register</p>
 <form action="{{ url_for('auth.register')}}" method="post">
-    <label for="email" class="form-label" >Email:</label>
-    <input class="form-control" type="email" name="email"><br>
 
     <label for="username" class="form-label" >Username:</label>
-    <input class="form-control" type="text" name="username"><br>
+    <input class="form-control" type="text" name="username" {% if username is defined %} value="{{ username }}" {% endif %}><br>
 
     <label for="password" class="form-label" >Password:</label>
     <input class="form-control"  type="password" name="password"><br>
 
+    <label for="confirm_password" class="form-label" >Confirm password:</label>
+    <input class="form-control"  type="password" name="confirm_password"><br>
+
     
 
     <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary px-5" name="login" method="post">Register account</button>
+        <button type="submit" class="btn btn-primary px-5" name="register" method="post">Register account</button>
     </div>
 
 

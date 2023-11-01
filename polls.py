@@ -20,14 +20,16 @@ def create_poll():
         answerIndex = 1
         while True:
             if new_answer_text := request.form.get(f'poll-answer-{answerIndex}'):
-                print(new_answer_text)
                 new_answer = Answer(text = new_answer_text, order = answerIndex)
                 answers.append(new_answer)
                 answerIndex += 1
             else:
                 break
         
-        new_poll = Poll(user_id = int(current_user.get_id()), name = request.form.get('poll-title'), answers = answers)
+        print(request.form.get('unlisted'))
+        unlisted = True if request.form.get('unlisted') else False
+
+        new_poll = Poll(user_id = int(current_user.get_id()), name = request.form.get('poll-title'), answers = answers, is_unlisted = unlisted)
 
         db = current_app.config["db"]
         db.session.add(new_poll)

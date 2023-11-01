@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, ForeignKey, Column, Table, select, func
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import DateTime, ForeignKey, Column, Table
 import datetime
 from flask_login import UserMixin
 import sqlalchemy as sa
@@ -25,7 +24,6 @@ users_answers_assoc = Table(
 class User(UserMixin, db.Model):
     __tablename__ = "user"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    email: Mapped[str] = mapped_column(db.String(254), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(db.String(128), nullable=False)
     username: Mapped[str] = mapped_column(db.String(30), unique=True, nullable=False)
     join_date: Mapped[datetime.date] = mapped_column(
@@ -58,6 +56,7 @@ class Poll(db.Model):
     answers: Mapped[List["Answer"]] = relationship(
         back_populates="poll", order_by="Answer.order"
     )
+    is_unlisted: Mapped[bool] = mapped_column(db.Boolean, default=False)
 
     @property
     def total_number_of_votes(self):

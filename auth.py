@@ -29,12 +29,12 @@ def login():
 
 @auth.route("/login/", methods=["POST"])
 def login_post():
-    email = request.form.get("email")
+    username = request.form.get("username")
     password = request.form.get("password")
 
     remember = True if request.form.get("remember") else False
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(username=username).first()
 
     if not user or not check_password_hash(user.password, password):
         flash("Please check your login details and try again.", "danger")
@@ -52,18 +52,25 @@ def register():
 
 @auth.route("/register/", methods=["POST"])
 def register_post():
-    email = request.form.get("email")
     username = request.form.get("username")
     password = request.form.get("password")
+    confirm_password = request.form.get("confirm_password")
 
-    user = User.query.filter_by(email=email).first()
+    if password != confirm_password:
+        flash("Passwords don't match", "danger")
+        return render_template("register.html", username=username)
+    
+    if password == "" or len(password) < 8:
+        flash("Password must be at least 8 characters long", "danger")
+        return render_template("register.html", username=username)
+
+    user = User.query.filter_by(username=username).first()
 
     if user:
-        flash("A username with this email address already exists")
+        flash("A user with this username already exists, please choose a different one.", "danger")
         return redirect(url_for("auth.register"))
 
     new_user = User(
-        email=email,
         username=username,
         password=generate_password_hash(password, method="sha256"),
     )
