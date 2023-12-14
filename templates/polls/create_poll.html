@@ -23,10 +23,15 @@ Create a new poll
             </div>
         </div>
 
-    
+        <p class="fs-4">Poll options</p>
         <div class="form-check">
             <input class="form-check-input" id="unlisted-checkbox" type="checkbox" name="unlisted" value="unlisted">
             <label class="form-check-label" for="unlisted-checkbox">Unlisted (available only with a link)</label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" id="see-before-voting-checkbox" type="checkbox" name="see-before-voting" value="see-before-voting">
+            <label class="form-check-label" for="see-before-voting-checkbox">Allow users to see the poll results before voting</label>
         </div>
 
         <div class="d-flex justify-content-center mt-5">
@@ -34,10 +39,6 @@ Create a new poll
                 question</button>
             <button type="submit" class="btn btn-primary px-5">Create a new poll</button>
         </div>
-
-        
-
-
     </div>
     {% endraw %}
 

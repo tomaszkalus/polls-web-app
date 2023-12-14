@@ -35,15 +35,18 @@ class User(UserMixin, db.Model):
     )
 
     @property
-    def voted_polls(self):
-        return [answer.poll for answer in self.voted_answers]
+    def voted_polls(self) -> set:
+        """Returns a set of polls that the user has voted in"""
+        return set([answer.poll for answer in self.voted_answers])
 
     @property
-    def number_of_polls_created(self):
+    def number_of_polls_created(self) -> int:
+        """Returns the number of polls that the user has created"""
         return len(self.polls)
 
     @property
-    def number_of_votes(self):
+    def number_of_votes(self) -> int:
+        """Returns the number of votes made by the user"""
         return len(self.voted_answers)
 
 
@@ -59,7 +62,8 @@ class Poll(db.Model):
     is_unlisted: Mapped[bool] = mapped_column(db.Boolean, default=False)
 
     @property
-    def total_number_of_votes(self):
+    def total_number_of_votes(self) -> int:
+        """Returns the total number of votes in the poll"""
         return sum(answer.number_of_votes for answer in self.answers)
 
 
@@ -75,11 +79,13 @@ class Answer(db.Model):
     poll: Mapped[Poll] = relationship(back_populates="answers")
 
     @property
-    def number_of_votes(self):
+    def number_of_votes(self) -> int:
+        """Returns the number of votes for the answer"""
         return len(self.users)
 
     @property
-    def answer_percent(self):
+    def answer_percent(self) -> float:
+        """Returns the percentage of votes for the answer"""
         total_votes = self.poll.total_number_of_votes
         if total_votes == 0:
             return 0

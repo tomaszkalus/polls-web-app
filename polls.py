@@ -16,8 +16,15 @@ def create_poll():
         return render_template("create_poll.html")
 
     if request.method == "POST":
+
+        poll_title = request.form.get("poll-title")
+        if poll_title == "":
+            flash("Poll title cannot be empty", "danger")
+            return redirect(url_for("polls.create_poll"))
+
         answers = []
         answerIndex = 1
+        
         while True:
             if new_answer_text := request.form.get(f'poll-answer-{answerIndex}'):
                 new_answer = Answer(text = new_answer_text, order = answerIndex)
@@ -29,7 +36,7 @@ def create_poll():
         print(request.form.get('unlisted'))
         unlisted = True if request.form.get('unlisted') else False
 
-        new_poll = Poll(user_id = int(current_user.get_id()), name = request.form.get('poll-title'), answers = answers, is_unlisted = unlisted)
+        new_poll = Poll(user_id = int(current_user.get_id()), name = poll_title, answers = answers, is_unlisted = unlisted)
 
         db = current_app.config["db"]
         db.session.add(new_poll)
@@ -50,7 +57,7 @@ def poll_vote(poll_id):
             poll_data = poll_answers_to_tuple(poll)
             return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
         
-        return render_template('poll.html', poll = poll)
+        return render_template('poll.html', poll = poll, user_is_creator = True if poll in current_user.polls else False)
     
     # Vote
     if request.method == "POST":

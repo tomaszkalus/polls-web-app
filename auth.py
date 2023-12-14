@@ -18,6 +18,8 @@ from flask_login import (
     current_user,
 )
 
+from .validation import validate_password, passwordValidationStatus
+
 auth = Blueprint("auth", __name__, template_folder="templates/auth")
 app = current_app
 
@@ -56,18 +58,19 @@ def register_post():
     password = request.form.get("password")
     confirm_password = request.form.get("confirm_password")
 
-    if password != confirm_password:
-        flash("Passwords don't match", "danger")
-        return render_template("register.html", username=username)
-    
-    if password == "" or len(password) < 8:
-        flash("Password must be at least 8 characters long", "danger")
+    password_validation = validate_password(password, confirm_password)
+
+    if not password_validation.is_valid:
+        flash(password_validation.message, "danger")
         return render_template("register.html", username=username)
 
     user = User.query.filter_by(username=username).first()
 
     if user:
-        flash("A user with this username already exists, please choose a different one.", "danger")
+        flash(
+            "A user with this username already exists, please choose a different one.",
+            "danger",
+        )
         return redirect(url_for("auth.register"))
 
     new_user = User(
@@ -112,3 +115,33 @@ def delete_account():
 
         flash("Your account was successfully deleted", "success")
         return redirect(url_for("main.home"))
+
+
+@auth.route("/change_password/", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "GET":
+        return render_template("change_password.html")
+
+    if request.method == "POST":
+        old_password = request.form.get("old_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_new_password")
+
+        user = User.query.filter_by(id=current_user.id).first()
+
+        if not check_password_hash(user.password, old_password):
+            flash("The password you've provided is incorrect.", "danger")
+            return redirect(url_for("auth.change_password"))
+
+        password_validation = validate_password(new_password, confirm_password)
+        if not password_validation.is_valid:
+            flash(password_validation.message, "danger")
+            return redirect(url_for("auth.change_password"))
+
+        user.password = generate_password_hash(new_password, method="sha256")
+        db = app.config["db"]
+        db.session.commit()
+
+        flash("Your password was successfully changed", "success")
+        return redirect(url_for("main.profile"))
