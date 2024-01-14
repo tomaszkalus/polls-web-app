@@ -1,0 +1,14 @@
+.custom-bar {
+    height: 5px;
+    text-align: center;
+    border-radius: 100px;
+    overflow: hidden;
+    background-color: rgb(165, 165, 165);
+    
+}
+
+.bar-segment {
+    margin-bottom: 15px;
+    height: 100%;
+    display: inline-block;
+}

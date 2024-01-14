@@ -45,36 +45,50 @@ def create_poll():
         flash(Markup(f"You've successfully created your new poll! You can see it <a href='/poll/{new_poll.id}'>here</a>"), "success")
         return redirect(url_for("main.home"))
 
-@polls.route("/poll/<poll_id>", methods=["GET", "POST"])
+
+@polls.route("/poll/<poll_id>/results", methods=["GET"])
+def poll_results(poll_id):
+    db = current_app.config["db"]
+    poll = db.session.get(Poll, poll_id)
+    poll_data = poll_answers_to_tuple(poll)
+
+    return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
+    
+
+@polls.route("/poll/<poll_id>/", methods=["GET", "POST"])
 def poll_vote(poll_id):
     db = current_app.config["db"]
     poll = db.session.get(Poll, poll_id)
-    voted_poll_ids = [answer.poll_id for answer in current_user.voted_answers]
+
+    if current_user.is_anonymous:
+        flash("You have to be logged in to vote in a poll", "warning")
+        return redirect(url_for("polls.poll_results", poll_id = poll_id))
+
+    voted_polls = current_user.voted_polls
+
+    if poll in voted_polls:
+        flash("You have already voted in this poll. Here are the results", "warning")
+        return redirect(url_for("polls.poll_results", poll_id = poll_id))
 
     # Show poll
-    if request.method == "GET":
-        if int(poll_id) in voted_poll_ids:
-            poll_data = poll_answers_to_tuple(poll)
-            return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
-        
+    if request.method == "GET":     
+        redirect(url_for("polls.poll_vote", poll_id = poll_id))
         return render_template('poll.html', poll = poll, user_is_creator = True if poll in current_user.polls else False)
+
     
     # Vote
     if request.method == "POST":
         voted_answer_index = int(request.form.get('poll-answer'))
         voted_answer = poll.answers[voted_answer_index - 1]
 
-        if int(poll_id) in voted_poll_ids:
-            poll_data = poll_answers_to_tuple(poll)
-            return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
-
         current_user.voted_answers.append(voted_answer)
         db.session.commit()
 
-        poll_data = poll_answers_to_tuple(poll)
         flash("You've successfully voted in this poll! Here are the results:", 'success')
-        return render_template('poll_results.html', poll = poll, poll_answers = poll_data)
+        return redirect(url_for("polls.poll_results", poll_id = poll_id))
     
+
+
 
 def poll_answers_to_tuple(poll):
     return tuple([(answer.text, answer.number_of_votes, answer.answer_percent) for answer in poll.answers])

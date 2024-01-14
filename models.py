@@ -26,8 +26,8 @@ class User(UserMixin, db.Model):
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
     password: Mapped[str] = mapped_column(db.String(128), nullable=False)
     username: Mapped[str] = mapped_column(db.String(30), unique=True, nullable=False)
-    join_date: Mapped[datetime.date] = mapped_column(
-        DateTime, default=datetime.date.today
+    join_date: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.now()
     )
     polls: Mapped[List["Poll"]] = relationship(back_populates="author")
     voted_answers: Mapped[List["Answer"]] = relationship(
@@ -35,9 +35,9 @@ class User(UserMixin, db.Model):
     )
 
     @property
-    def voted_polls(self) -> set:
+    def voted_polls(self) -> list:
         """Returns a set of polls that the user has voted in"""
-        return set([answer.poll for answer in self.voted_answers])
+        return [answer.poll for answer in self.voted_answers]
 
     @property
     def number_of_polls_created(self) -> int:
@@ -48,6 +48,10 @@ class User(UserMixin, db.Model):
     def number_of_votes(self) -> int:
         """Returns the number of votes made by the user"""
         return len(self.voted_answers)
+    
+    def did_vote(self, poll) -> bool:
+        """Returns True if the user has voted in the poll, False otherwise"""
+        return poll in self.voted_polls
 
 
 class Poll(db.Model):
@@ -60,11 +64,19 @@ class Poll(db.Model):
         back_populates="poll", order_by="Answer.order"
     )
     is_unlisted: Mapped[bool] = mapped_column(db.Boolean, default=False)
+    created: Mapped[datetime.datetime] = mapped_column(
+        DateTime, default=datetime.datetime.now(), nullable=False
+    )
 
     @property
     def total_number_of_votes(self) -> int:
         """Returns the total number of votes in the poll"""
         return sum(answer.number_of_votes for answer in self.answers)
+    
+    @property
+    def graph_data(self) -> tuple:
+        """Returns the poll data in a format that can be used by the chart.js library"""
+        return tuple([(answer.text, answer.number_of_votes, answer.answer_percent) for answer in self.answers])
 
 
 class Answer(db.Model):

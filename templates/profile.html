@@ -37,7 +37,6 @@ Polls - Your Profile
 
 <div class="mb-3">
     <h4>Your polls:</h4>
-    <ul class="list-group">
         {% if user.polls|length %}
             <ul class="list-group mb-2">
                 {% for poll in user.polls[:3] %}

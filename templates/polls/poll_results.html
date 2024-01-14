@@ -4,8 +4,22 @@ Poll - {{ poll.name }}
 {% endblock %}
 {% block content %}
 
-<p class="fw-bold fs-3">{{ poll.name }}</p>
+
+<p class="fs-5 mb-0 text-secondary">Poll</p>
+<p class="fw-bold fs-2 mb-0">{{ poll.name }}</p>
+
 <p><i class="fas fa-poll"></i> {{ poll.total_number_of_votes }} votes</p>
+
+
+{% if current_user.is_anonymous %}
+<p class="fst-italic"><a href="{{url_for("auth.login")}}">Log in</a> to vote in this poll.</p>
+{% elif current_user.did_vote(poll) %}
+<p class="fst-italic">You've already voted in this poll</p>
+{% else %}
+<a href="{{url_for("polls.poll_vote", poll_id=poll.id)}}" class="btn btn-primary px-5 mb-4">Vote</a>
+{% endif %}
+
+
 
 <div class="mb-5">
 {% for answer in poll.answers %}
@@ -18,7 +32,7 @@ Poll - {{ poll.name }}
 
 <div class="mt-5 d-flex justify-content-center">
     <div class="w-50">
-        <canvas  id="poll-results"></canvas>
+        <canvas id="poll-results"></canvas>
     </div>
 </div>
 

@@ -2,9 +2,99 @@
 {% set active_page = "index" %}
 
 {% block content %}
-<p class="fs-1">Welcome to the polls app!</p>
-<p>Feel free to <a href="{{ url_for('polls.create_poll')}}">create your first poll.</a></p>
 
-<p class="fs-1">Latest polls!</p>
+<p class="fs-1">Explore latest polls</p>
+
+<div id="polls-container" class="mb-5">
+    {% for poll in polls %}
+    {% if poll.is_unlisted is sameas false %}
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
+            <div class="poll-results-chart w-50 my-2" data-poll-id="{{ poll.id }}"></div>
+            <div class="mt-1">
+                <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script async>
+
+
+
+    async function getPollResults(pollId) {
+        const response = await fetch(`/api/${pollId}/results`).then(response => response.json())
+        return response
+    }
+
+
+    function placeChart(poll_results, pollId) {
+        const ctx = document.querySelector(`.poll-results-chart[data-poll-id="${pollId}"]`);
+
+        const pollAnswers = poll_results.map(subList => subList[0]);
+        const pollVotes = poll_results.map(subList => subList[1]);
+
+        const chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: pollAnswers,
+                datasets: [{
+                    label: '# of Votes',
+                    data: pollVotes,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    const polls = document.querySelectorAll('.poll-results-chart');
+    polls.forEach((poll, index) => {
+        const pollId = poll.dataset.pollId;
+        getPollResults(pollId).then(data => {
+            const pollVotes = data.map(subList => subList[1]);
+            const bar = customBarFactory(pollVotes);
+            poll.appendChild(bar);
+
+        })
+    });
+
+    const customBarFactory = (poll_values) => {
+
+        const barSegmentColors = ['#36a2eb', '#ff6384', '#4bc0c0', '#ff9f40', '#ffcd56', '#c9cbcf', '#8a80b1', '#ffa07a']
+        const bar = document.createElement('div');
+        const totalVotesCount = poll_values.reduce((acc, curr) => acc + curr);
+
+        bar.classList.add('custom-bar');
+        for (let i = 0; i < poll_values.length; i++) {
+            const barSegment = document.createElement('div');
+            let barSegmentWidth;
+            if (totalVotesCount === 0) {
+                barSegmentWidth = 0;
+            } else {
+                barSegmentWidth = (poll_values[i] / totalVotesCount) * 100;
+            }
+
+            barSegment.classList.add('bar-segment');
+            barSegment.style.width = `${barSegmentWidth}%`;
+            barSegment.style.backgroundColor = barSegmentColors[i];
+            bar.appendChild(barSegment);
+        }
+        return bar;
+    }
+
+</script>
 
 {% endblock %}
