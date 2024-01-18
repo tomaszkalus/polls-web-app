@@ -3,20 +3,23 @@
 
 {% block content %}
 
-<p class="fs-1">Explore latest polls</p>
+<p class="fs-1 mb-4">Explore latest polls</p>
 
 <div id="polls-container" class="mb-5">
     {% for poll in polls %}
     {% if poll.is_unlisted is sameas false %}
 
-    <div class="card mt-3">
+    <div class="card mt-3 rounded-0 border-0 bg-light">
         <div class="card-body">
-            <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
-            <div class="poll-results-chart w-50 my-2" data-poll-id="{{ poll.id }}"></div>
+            
+            <a class="text-decoration-none text-body fs-5" href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
+            
             <div class="mt-1">
                 <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
             </div>
+            
         </div>
+        <div class="poll-results-chart" data-poll-id="{{ poll.id }}"></div>
     </div>
     {% endif %}
     {% endfor %}
