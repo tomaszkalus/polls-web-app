@@ -1,3 +1,5 @@
+""" This module contains all the routes related to polls. """
+
 from flask import (
     Blueprint,
     render_template,
@@ -17,6 +19,7 @@ from .models import Poll
 
 @polls.route("/new_poll", methods=["GET", "POST"])
 def create_poll():
+    """Route for creating a new poll. It only lets logged to create a poll."""
     if request.method == "GET":
         if current_user.is_anonymous:
             flash("You have to be logged in to create a poll", "warning")
@@ -41,7 +44,6 @@ def create_poll():
             else:
                 break
 
-        print(request.form.get("unlisted"))
         unlisted = True if request.form.get("unlisted") else False
 
         new_poll = Poll(
@@ -66,15 +68,20 @@ def create_poll():
 
 @polls.route("/poll/<poll_id>/results", methods=["GET"])
 def poll_results(poll_id):
+    """Route for displaying the results of a poll."""
     db = current_app.config["db"]
     poll = db.session.get(Poll, poll_id)
-    poll_data = poll_answers_to_tuple(poll)
+    if not poll:
+        flash("This poll does not exist", "warning")
+        return redirect(url_for("main.home"))
 
+    poll_data = poll.graph_data
     return render_template("poll_results.html", poll=poll, poll_answers=poll_data)
 
 
 @polls.route("/poll/<poll_id>/", methods=["GET", "POST"])
 def poll_vote(poll_id):
+    """Route for voting in a poll."""
     db = current_app.config["db"]
     poll = db.session.get(Poll, poll_id)
 
@@ -83,7 +90,6 @@ def poll_vote(poll_id):
         return redirect(url_for("polls.poll_results", poll_id=poll_id))
 
     if poll in current_user.voted_polls:
-        flash("You have already voted in this poll. Here are the results", "warning")
         return redirect(url_for("polls.poll_results", poll_id=poll_id))
 
     if request.method == "GET":
@@ -107,10 +113,40 @@ def poll_vote(poll_id):
         return redirect(url_for("polls.poll_results", poll_id=poll_id))
 
 
-def poll_answers_to_tuple(poll):
-    return tuple(
-        [
-            (answer.text, answer.number_of_votes, answer.answer_percent)
-            for answer in poll.answers
-        ]
-    )
+@polls.route("/your_polls/", methods=["GET"])
+def user_created_polls():
+    """Route for displaying all the polls that the user has created."""
+    if current_user.is_anonymous:
+        flash("You have to be logged in to view your polls", "warning")
+        return redirect(url_for("auth.login"))
+
+    if not current_user.polls:
+        flash("You haven't created any polls yet", "warning")
+        return redirect(url_for("auth.profile"))
+
+    return render_template("all_user_created_polls.html", polls=current_user.polls)
+
+
+@polls.route("/delete_poll/<poll_id>", methods=["POST"])
+def delete_poll(poll_id):
+    """Route for deleting a poll."""
+    if current_user.is_anonymous:
+        flash("You have to be logged in to delete a poll", "warning")
+        return redirect(url_for("auth.login"))
+
+    poll_id = int(poll_id)
+
+    db = current_app.config["db"]
+    poll = db.session.get(Poll, poll_id)
+
+    if poll not in current_user.polls:
+        flash("You can't delete a poll that you haven't created", "danger")
+        return redirect(url_for("auth.profile"))
+
+    db.session.delete(poll)
+    db.session.commit()
+
+    print(f"Deleted poll with id {poll_id}")
+
+    flash("You've successfully deleted the poll", "success")
+    return redirect(url_for("main.profile"))

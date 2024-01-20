@@ -1,10 +1,13 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, ForeignKey, Column, Table
+""" This module contains data models of the application. """
+
 import datetime
-from flask_login import UserMixin
-import sqlalchemy as sa
 from typing import List
+
+import sqlalchemy as sa
+from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, DateTime, ForeignKey, Table
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
@@ -61,7 +64,7 @@ class Poll(db.Model):
     author: Mapped[User] = relationship(back_populates="polls")
     name: Mapped[str] = mapped_column(db.String(128))
     answers: Mapped[List["Answer"]] = relationship(
-        back_populates="poll", order_by="Answer.order"
+        back_populates="poll", order_by="Answer.order", cascade="all, delete-orphan"
     )
     is_unlisted: Mapped[bool] = mapped_column(db.Boolean, default=False)
     created: Mapped[datetime.datetime] = mapped_column(

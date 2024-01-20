@@ -3,25 +3,14 @@
 
 {% block content %}
 
+{% import 'macros/poll_home_page_card.html' as card %}
+
 <p class="fs-1 mb-4">Explore latest polls</p>
 
 <div id="polls-container" class="mb-5">
+    
     {% for poll in polls %}
-    {% if poll.is_unlisted is sameas false %}
-
-    <div class="card mt-3 rounded-0 border-0 bg-light">
-        <div class="card-body">
-            
-            <a class="text-decoration-none text-body fs-5" href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
-            
-            <div class="mt-1">
-                <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
-            </div>
-            
-        </div>
-        <div class="poll-results-chart" data-poll-id="{{ poll.id }}"></div>
-    </div>
-    {% endif %}
+        {{ card.home_page_poll_card(poll) }}
     {% endfor %}
 </div>
 
@@ -30,37 +19,9 @@
 <script async>
 
 
-
     async function getPollResults(pollId) {
         const response = await fetch(`/api/${pollId}/results`).then(response => response.json())
         return response
-    }
-
-
-    function placeChart(poll_results, pollId) {
-        const ctx = document.querySelector(`.poll-results-chart[data-poll-id="${pollId}"]`);
-
-        const pollAnswers = poll_results.map(subList => subList[0]);
-        const pollVotes = poll_results.map(subList => subList[1]);
-
-        const chart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: pollAnswers,
-                datasets: [{
-                    label: '# of Votes',
-                    data: pollVotes,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
     }
 
     const polls = document.querySelectorAll('.poll-results-chart');

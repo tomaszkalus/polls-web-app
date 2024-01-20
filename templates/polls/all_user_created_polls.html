@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block page_title %}
+Polls - Your polls
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-2">Your polls</h1>
+<h5 class="mb-4">You've created {{ polls|length }} poll(s)</h5>
+
+<p class="fs-6 mb-4"></p>
+
+{% if polls|length %}
+    <ul class="list-group mb-2">
+        {% for poll in polls[:3] %}
+        <li class="list-group-item">
+            <a href="{{ url_for('polls.poll_results', poll_id=poll.id) }}">{{poll.name}}</a>
+            <div class="mt-1">
+                <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
+
+                {% if poll.is_unlisted %}
+                <span><i class="fas fa-unlock me-1"></i>Unlisted</span>
+                {% else %}
+                <span><i class="fas fa-eye me-1"></i>Public</span>
+                {% endif %}
+
+                <a class="ms-2" href=""><i class="fas fa-edit me-1"></i>Edit poll</a>
+                <a class="ms-2 text-danger" href=""><i class="fas fa-trash me-1"></i>Delete poll</a>
+                
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="fst-italic">You haven't created any poll yet.</p>
+{% endif %}
+
+{% endblock %}

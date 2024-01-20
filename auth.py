@@ -1,24 +1,19 @@
+""" This module contains the routes for the authentication blueprint. """
+
 from flask import (
     Blueprint,
-    render_template,
-    redirect,
-    url_for,
-    request,
     current_app,
     flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
+from flask_login import current_user, login_required, login_user, logout_user
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User
-from flask_login import (
-    login_user,
-    login_required,
-    logout_user,
-    login_manager,
-    current_user,
-)
-
-from .validation import validate_password, passwordValidationStatus
+from .validation import validate_password
 
 auth = Blueprint("auth", __name__, template_folder="templates/auth")
 app = current_app
@@ -26,11 +21,13 @@ app = current_app
 
 @auth.route("/login/")
 def login():
+    """Renders the login page"""
     return render_template("login.html")
 
 
 @auth.route("/login/", methods=["POST"])
 def login_post():
+    """Login handler"""
     username = request.form.get("username")
     password = request.form.get("password")
 
@@ -49,11 +46,13 @@ def login_post():
 
 @auth.route("/register/")
 def register():
+    """Renders the register page"""
     return render_template("register.html")
 
 
 @auth.route("/register/", methods=["POST"])
 def register_post():
+    """Register handler"""
     username = request.form.get("username")
     password = request.form.get("password")
     confirm_password = request.form.get("confirm_password")
@@ -89,6 +88,7 @@ def register_post():
 @auth.route("/logout/")
 @login_required
 def logout():
+    """Logout handler"""
     logout_user()
     flash("You were successfully logged out", "success")
     return redirect(url_for("main.home"))
@@ -97,6 +97,7 @@ def logout():
 @auth.route("/delete_account/", methods=["GET", "POST"])
 @login_required
 def delete_account():
+    """Route responsible for deleting the user's account"""
     if request.method == "GET":
         return render_template("delete_account.html")
 
@@ -120,6 +121,7 @@ def delete_account():
 @auth.route("/change_password/", methods=["GET", "POST"])
 @login_required
 def change_password():
+    """Route responsible for changing the user's password"""
     if request.method == "GET":
         return render_template("change_password.html")
 
@@ -144,4 +146,4 @@ def change_password():
         db.session.commit()
 
         flash("Your password was successfully changed", "success")
-        return redirect(url_for("main.profile"))
+        return redirect(location=url_for("main.profile"))
