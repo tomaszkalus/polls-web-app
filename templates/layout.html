@@ -17,9 +17,9 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    {% include 'navbar.html' %}
-    <div class="container mt-3 p-4">
-        {% include 'flash_alerts.html' %}
+    {% include 'fragments/navbar.html' %}
+    <div class="container mt-3 p-4 ">
+        {% include 'fragments/flash_alerts.html' %}
 
         {% block content %}
         {% endblock %}
@@ -32,7 +32,7 @@
         crossorigin="anonymous"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-    {% include 'footer.html' %}
+    {% include 'fragments/footer.html' %}
 
 </body>
 

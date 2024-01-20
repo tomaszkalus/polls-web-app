@@ -8,10 +8,10 @@ Create a new poll
 {% block content %}
 <p class="fs-1">Create a new poll</p>
 
-<form action="{{ url_for('polls.create_poll') }}" method="post">
+<form action="{{ url_for('polls.create_poll') }}" method="post" autocomplete="off">
     <label for="poll-title-input">Poll title:</label>
     <input class="form-control mb-3" type="text" name="poll-title" id="poll-title-input"
-        placeholder="Eg. What's your favourite food?">
+        placeholder="Eg. What's your favourite food?" >
 
     {% raw %}
     <div id="answers-editor">

@@ -1,28 +1,47 @@
 {% extends "layout.html" %}
+{% block page_title %}
+{{ poll.name }} - Poll
+{% endblock %}
 {% block content %}
 
-<p class="fw-bold fs-3">{{ poll.name }}</p>
+{% import 'macros/poll_header.html' as header %}
 
-<form method="post">
-    {% for answer in poll.answers %}
-    <div class="form-check poll-answers">
-        <input class="form-check-input" type="radio" name="poll-answer" id="answer-{{ loop.index }}" data-answer_id="{{ loop.index }}" value="{{ loop.index }}">
-        <label class="form-check-label" for="answer-{{ loop.index }}">
-            {{ answer.text }}
-        </label>
+<div class="d-flex justify-content-center mt-4">
+    <div class="w-75 bg-light p-3">
+
+        {{ header.render_poll_header(poll) }}
+
+        <form method="post" class="mt-4">
+            {% for answer in poll.answers %}
+            <div class="form-check poll-answers">
+                <input class="form-check-input" type="radio" name="poll-answer" id="answer-{{ loop.index }}"
+                    data-answer_id="{{ loop.index }}" value="{{ loop.index }}">
+                <label class="form-check-label" for="answer-{{ loop.index }}">
+                    {{ answer.text }}
+                </label>
+            </div>
+            {% endfor %}
+
+
+            <div class="mt-4">
+
+                <button type="submit"
+                    class="btn btn-primary px-5 d-inline-flex justify-content-center align-items-center">
+                    Vote <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+                <a href="{{url_for("polls.poll_results", poll_id=poll.id)}}"
+                    class="btn btn-secondary px-5 d-inline-flex justify-content-center align-items-center">
+                    See the results <i class="fas fa-chart-bar ms-2"></i></a>
+
+            </div>
+
+        </form>
+
+        <script>
+            document.querySelector('#answer-1').checked = true;
+        </script>
+
     </div>
-    {% endfor %}
-
-    
-    <div class="mt-3">
-        <button type="submit" class="btn btn-primary px-5 mt-3">Vote</button>
-        <a href="{{url_for("polls.poll_results", poll_id=poll.id)}}" class="btn btn-secondary px-5 mt-3">See the results</a>
-    </div>
-    
-</form>
-
-<script>
-    document.querySelector('#answer-1').checked = true;
-</script>
+</div>
 
 {% endblock %}

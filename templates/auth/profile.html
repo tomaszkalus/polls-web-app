@@ -41,7 +41,7 @@ Polls - Your Profile
             <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
             <div class="mt-1">
                 <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
-                {% if poll.is_unlisted is sameas true %}
+                {% if poll.is_unlisted %}
                 <span><i class="fas fa-unlock me-1"></i>Unlisted</span>
                 {% else %}
                 <span><i class="fas fa-eye me-1"></i>Public</span>

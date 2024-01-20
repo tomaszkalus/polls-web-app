@@ -1,0 +1,31 @@
+{% macro render_edit_modal(poll) %}
+<div class="modal fade" id="edit-poll-modal" tabindex="-1" aria-labelledby="edit-poll-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('polls.edit_poll', poll_id=poll.id)}}" method="post">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="edit-poll-modal-label">Edit poll</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <label for="poll-visibility-edit">Poll visibility:</label>
+                    <select name="poll-visibility" id="poll-visibility-edit" class="form-select" aria-label="Poll visibility selection">
+                        <option value="public" {% if not poll.is_unlisted %} selected {% endif %}>
+                            Public
+                        </option>
+                        <option value="unlisted" {% if poll.is_unlisted %} selected {% endif %}>
+                            Unlisted
+                        </option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" data-poll-id="{{poll.id}}" id="poll-edit-btn"
+                        class="btn btn-primary">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endmacro %}

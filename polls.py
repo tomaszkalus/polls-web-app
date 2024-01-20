@@ -58,12 +58,10 @@ def create_poll():
         db.session.commit()
 
         flash(
-            Markup(
-                f"You've successfully created your new poll! You can see it <a href='/poll/{new_poll.id}'>here</a>"
-            ),
+            "You've successfully created your new poll!",
             "success",
         )
-        return redirect(url_for("main.home"))
+        return redirect(url_for("polls.poll_results", poll_id=new_poll.id))
 
 
 @polls.route("/poll/<poll_id>/results", methods=["GET"])
@@ -86,7 +84,6 @@ def poll_vote(poll_id):
     poll = db.session.get(Poll, poll_id)
 
     if current_user.is_anonymous:
-        flash("You have to be logged in to vote in a poll", "warning")
         return redirect(url_for("polls.poll_results", poll_id=poll_id))
 
     if poll in current_user.voted_polls:
@@ -141,7 +138,7 @@ def delete_poll(poll_id):
 
     if poll not in current_user.polls:
         flash("You can't delete a poll that you haven't created", "danger")
-        return redirect(url_for("auth.profile"))
+        return redirect(url_for("main.profile"))
 
     db.session.delete(poll)
     db.session.commit()
@@ -150,3 +147,28 @@ def delete_poll(poll_id):
 
     flash("You've successfully deleted the poll", "success")
     return redirect(url_for("main.profile"))
+
+
+@polls.route("/poll/<poll_id>/edit", methods=["POST"])
+def edit_poll(poll_id):
+    """Route for editing a poll."""
+    if current_user.is_anonymous:
+        flash("You have to be logged in to edit a poll", "warning")
+        return redirect(url_for("auth.login"))
+
+    db = current_app.config["db"]
+    poll = db.session.get(Poll, poll_id)
+
+    if poll not in current_user.polls:
+        flash("You can't edit a poll that you haven't created", "danger")
+        return redirect(url_for("main.profile"))
+
+    unlisted = True if request.form.get("poll-visibility") == "unlisted" else False
+    poll.is_unlisted = unlisted
+    db.session.commit()
+
+    flash(
+        "You've successfully edited your poll!",
+        "success",
+    )
+    return redirect(url_for("polls.poll_results", poll_id=poll.id))

@@ -1,0 +1,7 @@
+{% macro render_poll_header(poll) %}
+<div class="mb-2">
+    <p class="fs-5 mb-0 text-secondary">Poll</p>
+    <p class="fw-bold fs-2 mb-0">{{ poll.name }}</p>
+    <p>by {{poll.author.username}} • {{poll.created}}</p>
+</div>
+{% endmacro %}
