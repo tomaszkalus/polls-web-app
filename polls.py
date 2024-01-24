@@ -8,13 +8,15 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    Markup,
 )
 from flask_login import current_user
 
-polls = Blueprint("polls", __name__, template_folder="templates/polls")
 from .models import Answer
 from .models import Poll
+from generate_identifier import generate_unique_id
+import config as cfg
+
+polls = Blueprint("polls", __name__, template_folder="templates/polls")
 
 
 @polls.route("/new_poll", methods=["GET", "POST"])
@@ -34,13 +36,13 @@ def create_poll():
             return redirect(url_for("polls.create_poll"))
 
         answers = []
-        answerIndex = 1
+        answer_index = 1
 
         while True:
-            if new_answer_text := request.form.get(f"poll-answer-{answerIndex}"):
-                new_answer = Answer(text=new_answer_text, order=answerIndex)
+            if new_answer_text := request.form.get(f"poll-answer-{answer_index}"):
+                new_answer = Answer(text=new_answer_text, order=answer_index)
                 answers.append(new_answer)
-                answerIndex += 1
+                answer_index += 1
             else:
                 break
 
@@ -51,6 +53,7 @@ def create_poll():
             name=poll_title,
             answers=answers,
             is_unlisted=unlisted,
+            uuid=generate_unique_id(cfg.POLL_UUID_LENGTH),
         )
 
         db = current_app.config["db"]
@@ -124,17 +127,21 @@ def user_created_polls():
     return render_template("all_user_created_polls.html", polls=current_user.polls)
 
 
-@polls.route("/delete_poll/<poll_id>", methods=["POST"])
-def delete_poll(poll_id):
+@polls.route("/delete_poll/", methods=["POST"])
+def delete_poll():
     """Route for deleting a poll."""
     if current_user.is_anonymous:
         flash("You have to be logged in to delete a poll", "warning")
         return redirect(url_for("auth.login"))
-
-    poll_id = int(poll_id)
+    
+    poll_id = int(request.form.get("poll-id"))
 
     db = current_app.config["db"]
     poll = db.session.get(Poll, poll_id)
+
+    if not poll:
+        flash("This poll does not exist", "warning")
+        return redirect(url_for("main.home"))
 
     if poll not in current_user.polls:
         flash("You can't delete a poll that you haven't created", "danger")

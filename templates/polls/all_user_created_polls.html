@@ -13,7 +13,7 @@ Polls - Your polls
 
 {% if polls|length %}
     <ul class="list-group mb-2">
-        {% for poll in polls[:3] %}
+        {% for poll in polls %}
         <li class="list-group-item">
             <a href="{{ url_for('polls.poll_results', poll_id=poll.id) }}">{{poll.name}}</a>
             <div class="mt-1">

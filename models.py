@@ -8,6 +8,8 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, DateTime, ForeignKey, Table
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+import config as cfg
+
 
 
 class Base(DeclarativeBase):
@@ -60,6 +62,7 @@ class User(UserMixin, db.Model):
 class Poll(db.Model):
     __tablename__ = "poll"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    uuid: Mapped[str] = mapped_column(db.String(cfg.POLL_UUID_LENGTH), unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(sa.ForeignKey("user.id"))
     author: Mapped[User] = relationship(back_populates="polls")
     name: Mapped[str] = mapped_column(db.String(128))

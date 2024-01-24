@@ -63,27 +63,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 
-
-    (() => {
-        const poll_delete_btn = document.querySelector('#poll-delete-btn');
-    poll_delete_btn.addEventListener('click', () => {
-        const poll_id = poll_delete_btn.dataset.pollId;
-        const poll_name = poll_delete_btn.dataset.pollName;
-        const delete_url = `/delete_poll/${poll_id}`;
-        console.log(poll_id)
-
-
-        fetch(delete_url, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        })
-    })
-    })();
-
-    
-
     const poll_results = {{ poll_answers | tojson }};
 
     const pollAnswers = poll_results.map(subList => subList[0]);

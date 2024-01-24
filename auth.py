@@ -53,8 +53,7 @@ def register():
 @auth.route("/register/", methods=["POST"])
 def register_post():
     """Register handler"""
-    username = request.form.get("username")
-    password = request.form.get("password")
+    username, password = request.form.get("username"), request.form.get("password")
     confirm_password = request.form.get("confirm_password")
 
     password_validation = validate_password(password, confirm_password)
