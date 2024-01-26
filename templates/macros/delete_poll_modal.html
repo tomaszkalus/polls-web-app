@@ -4,7 +4,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('polls.delete_poll')}}" method="post">
-                <input type="hidden" name="poll-id" value="{{poll.id}}">
+                <input type="hidden" name="poll-id" value="{{poll.hashed_id}}">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="delete-poll-modal-label">Delete poll</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -14,7 +14,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" data-poll-id="{{poll.id}}" id="poll-delete-btn" class="btn btn-danger">Delete
+                    <button type="submit" data-poll-id="{{poll.hashed_id}}" id="poll-delete-btn" class="btn btn-danger">Delete
                         poll</button>
                 </div>
             </form>

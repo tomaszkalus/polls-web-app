@@ -29,10 +29,10 @@ Create a new poll
             <label class="form-check-label" for="unlisted-checkbox">Unlisted (available only with a link)</label>
         </div>
 
-        <!-- <div class="form-check">
-            <input class="form-check-input" id="see-before-voting-checkbox" checked type="checkbox" name="see-before-voting" value="see-before-voting">
-            <label class="form-check-label" for="see-before-voting-checkbox">Allow users to see the poll results before voting</label>
-        </div> -->
+        <div class="form-check">
+            <input class="form-check-input" id="anonymous-checkbox" type="checkbox" name="anonymous" value="anonymous">
+            <label class="form-check-label" for="anonymous-checkbox">Create anonymous poll (your username will not be visible)</label>
+        </div>
 
         <div class="d-flex justify-content-center mt-5">
             <button type="button" @click="addAnswer" class="btn btn-primary px-5 me-5" id="add-new-answer-btn">Add new

@@ -11,7 +11,7 @@ Your created polls
     <ul class="list-group">
         {% for poll in user.polls[:3] %}
         <li class="list-group-item">
-            <a href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a> <span>by
+            <a href="{{ url_for('polls.poll_vote', hashed_poll_id=poll.hashed_id) }}">{{poll.name}}</a> <span>by
                 {{poll.author.username}}</span>
             <div class="mt-1">
                 <span class="me-3"><i class="fas fa-user me-2"></i>{{ poll.author.username }}</span>

@@ -8,13 +8,12 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, DateTime, ForeignKey, Table
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-import config as cfg
-
-
+from sqids import Sqids
 
 class Base(DeclarativeBase):
     pass
 
+sqids = Sqids(min_length=5)
 
 db = SQLAlchemy(model_class=Base)
 
@@ -62,7 +61,6 @@ class User(UserMixin, db.Model):
 class Poll(db.Model):
     __tablename__ = "poll"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
-    uuid: Mapped[str] = mapped_column(db.String(cfg.POLL_UUID_LENGTH), unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(sa.ForeignKey("user.id"))
     author: Mapped[User] = relationship(back_populates="polls")
     name: Mapped[str] = mapped_column(db.String(128))
@@ -83,6 +81,11 @@ class Poll(db.Model):
     def graph_data(self) -> tuple:
         """Returns the poll data in a format that can be used by the chart.js library"""
         return tuple([(answer.text, answer.number_of_votes, answer.answer_percent) for answer in self.answers])
+    
+    @property
+    def hashed_id(self) -> str:
+        """Returns the hash of the poll id"""
+        return sqids.encode([self.id])
 
 
 class Answer(db.Model):

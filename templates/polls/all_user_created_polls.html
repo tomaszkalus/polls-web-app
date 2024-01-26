@@ -15,7 +15,7 @@ Polls - Your polls
     <ul class="list-group mb-2">
         {% for poll in polls %}
         <li class="list-group-item">
-            <a href="{{ url_for('polls.poll_results', poll_id=poll.id) }}">{{poll.name}}</a>
+            <a href="{{ url_for('polls.poll_results', hashed_poll_id=poll.hashed_id) }}">{{poll.name}}</a>
             <div class="mt-1">
                 <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
 

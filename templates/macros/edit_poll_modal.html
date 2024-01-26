@@ -2,7 +2,7 @@
 <div class="modal fade" id="edit-poll-modal" tabindex="-1" aria-labelledby="edit-poll-modal-label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('polls.edit_poll', poll_id=poll.id)}}" method="post">
+            <form action="{{ url_for('polls.edit_poll', hashed_poll_id=poll.hashed_id)}}" method="post">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="edit-poll-modal-label">Edit poll</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

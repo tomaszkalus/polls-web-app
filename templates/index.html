@@ -4,6 +4,7 @@
 {% block content %}
 
 {% import 'macros/poll_home_page_card.html' as card %}
+{% import 'macros/pagination.html' as pagination %}
 
 <p class="fs-1 mb-4">Explore latest polls</p>
 
@@ -13,6 +14,8 @@
         {{ card.home_page_poll_card(poll) }}
     {% endfor %}
 </div>
+
+{{ pagination.render_pagination(polls, "main.polls_page") }}
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -1,18 +1,39 @@
 {% macro render_pagination(pagination, endpoint) %}
-  <div class=page-items>
+<div class="d-flex justify-content-center">
+  <div>
+  <div class="text-center mb-2">
     {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
   </div>
-  <div class=pagination>
-    {% for page in pagination.iter_pages() %}
-      {% if page %}
-        {% if page != pagination.page %}
-          <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+
+      <li class="page-item 
+      {% if not pagination.has_prev %}disabled{% endif %}">
+        <a class="page-link" href="{{ url_for(endpoint, page=pagination.prev_num) }}">Previous</a>
+      </li>
+
+      {% for page in pagination.iter_pages() %}
+        {% if page %}
+          {% if page != pagination.page %}
+            <li class="page-item"><a class="page-link" href="{{ url_for(endpoint, page=page) }}">{{ page }}</a></li>
+          {% else %}
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="#">{{ page }}</a>
+            </li>
+          {% endif %}
         {% else %}
-          <strong>{{ page }}</strong>
+        <li class="page-item">...</li>
         {% endif %}
-      {% else %}
-        <span class=ellipsis>…</span>
-      {% endif %}
-    {% endfor %}
-  </div>
+      {% endfor %}
+
+      <li class="page-item 
+      {% if not pagination.has_next %}disabled{% endif %}">
+        <a class="page-link" href="{{ url_for(endpoint, page=pagination.next_num) }}">Next</a>
+      </li>
+
+    </ul>
+  </nav>
+</div>
+</div>
 {% endmacro %}
+

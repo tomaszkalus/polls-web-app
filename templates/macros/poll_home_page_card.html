@@ -3,7 +3,7 @@
 <div class="card mt-3 rounded-0 border-0 bg-light">
     <div class="card-body">
         
-        <a class="text-decoration-none text-body fs-5" href="{{ url_for('polls.poll_vote', poll_id=poll.id) }}">{{poll.name}}</a>
+        <a class="text-decoration-none text-body fs-5" href="{{ url_for('polls.poll_vote', hashed_poll_id=poll.hashed_id) }}">{{poll.name}}</a>
         
         <div class="mt-1">
             <span class=""><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
@@ -15,7 +15,7 @@
         </div>
         
     </div>
-    <div class="poll-results-chart" data-poll-id="{{ poll.id }}"></div>
+    <div class="poll-results-chart" data-poll-id="{{ poll.hashed_id }}"></div>
 </div>
         
 {%- endmacro %}

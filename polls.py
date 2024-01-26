@@ -13,8 +13,7 @@ from flask_login import current_user
 
 from .models import Answer
 from .models import Poll
-from generate_identifier import generate_unique_id
-import config as cfg
+from .utils import decode_url_identifier
 
 polls = Blueprint("polls", __name__, template_folder="templates/polls")
 
@@ -52,8 +51,7 @@ def create_poll():
             user_id=int(current_user.get_id()),
             name=poll_title,
             answers=answers,
-            is_unlisted=unlisted,
-            uuid=generate_unique_id(cfg.POLL_UUID_LENGTH),
+            is_unlisted=unlisted
         )
 
         db = current_app.config["db"]
@@ -64,13 +62,16 @@ def create_poll():
             "You've successfully created your new poll!",
             "success",
         )
-        return redirect(url_for("polls.poll_results", poll_id=new_poll.id))
+        return redirect(url_for("polls.poll_results", hashed_poll_id=new_poll.hashed_id))
 
 
-@polls.route("/poll/<poll_id>/results", methods=["GET"])
-def poll_results(poll_id):
+@polls.route("/poll/<string:hashed_poll_id>/results", methods=["GET"])
+def poll_results(hashed_poll_id: str):
     """Route for displaying the results of a poll."""
     db = current_app.config["db"]
+    
+    poll_id = decode_url_identifier(hashed_poll_id)
+
     poll = db.session.get(Poll, poll_id)
     if not poll:
         flash("This poll does not exist", "warning")
@@ -80,24 +81,26 @@ def poll_results(poll_id):
     return render_template("poll_results.html", poll=poll, poll_answers=poll_data)
 
 
-@polls.route("/poll/<poll_id>/", methods=["GET", "POST"])
-def poll_vote(poll_id):
+@polls.route("/poll/<string:hashed_poll_id>/", methods=["GET", "POST"])
+def poll_vote(hashed_poll_id: str):
     """Route for voting in a poll."""
     db = current_app.config["db"]
+
+    poll_id = decode_url_identifier(hashed_poll_id)
+
     poll = db.session.get(Poll, poll_id)
 
-    if current_user.is_anonymous:
-        return redirect(url_for("polls.poll_results", poll_id=poll_id))
+    if not poll:
+        flash("This poll does not exist", "warning")
+        return redirect(url_for("main.home"))
 
-    if poll in current_user.voted_polls:
-        return redirect(url_for("polls.poll_results", poll_id=poll_id))
+    if current_user.is_anonymous or (poll in current_user.voted_polls):
+        return redirect(url_for("polls.poll_results", hashed_poll_id=hashed_poll_id))
 
     if request.method == "GET":
-        redirect(url_for("polls.poll_vote", poll_id=poll_id))
         return render_template(
             "poll.html",
-            poll=poll,
-            user_is_creator=True if poll in current_user.polls else False,
+            poll=poll
         )
 
     if request.method == "POST":
@@ -110,7 +113,7 @@ def poll_vote(poll_id):
         flash(
             "You've successfully voted in this poll! Here are the results:", "success"
         )
-        return redirect(url_for("polls.poll_results", poll_id=poll_id))
+        return redirect(url_for("polls.poll_results", hashed_poll_id=hashed_poll_id))
 
 
 @polls.route("/your_polls/", methods=["GET"])
@@ -134,7 +137,8 @@ def delete_poll():
         flash("You have to be logged in to delete a poll", "warning")
         return redirect(url_for("auth.login"))
     
-    poll_id = int(request.form.get("poll-id"))
+    poll_hashed_id = request.form.get("poll-id")
+    poll_id = decode_url_identifier(poll_hashed_id)
 
     db = current_app.config["db"]
     poll = db.session.get(Poll, poll_id)
@@ -150,18 +154,18 @@ def delete_poll():
     db.session.delete(poll)
     db.session.commit()
 
-    print(f"Deleted poll with id {poll_id}")
-
     flash("You've successfully deleted the poll", "success")
     return redirect(url_for("main.profile"))
 
 
-@polls.route("/poll/<poll_id>/edit", methods=["POST"])
-def edit_poll(poll_id):
+@polls.route("/poll/<string:hashed_poll_id>/edit", methods=["POST"])
+def edit_poll(hashed_poll_id : str):
     """Route for editing a poll."""
     if current_user.is_anonymous:
         flash("You have to be logged in to edit a poll", "warning")
         return redirect(url_for("auth.login"))
+    
+    poll_id = decode_url_identifier(hashed_poll_id)
 
     db = current_app.config["db"]
     poll = db.session.get(Poll, poll_id)
@@ -178,4 +182,4 @@ def edit_poll(poll_id):
         "You've successfully edited your poll!",
         "success",
     )
-    return redirect(url_for("polls.poll_results", poll_id=poll.id))
+    return redirect(url_for("polls.poll_results", hashed_poll_id=poll.hashed_id))
