@@ -13,6 +13,7 @@ from flask_login import current_user
 
 from .models import Answer
 from .models import Poll
+from .models import PollTag
 from .utils import decode_url_identifier
 
 polls = Blueprint("polls", __name__, template_folder="templates/polls")
@@ -26,7 +27,9 @@ def create_poll():
             flash("You have to be logged in to create a poll", "warning")
             return redirect(url_for("auth.login"))
 
-        return render_template("create_poll.html")
+        db = current_app.config["db"]
+        poll_tags = db.session.query(PollTag).all()
+        return render_template("create_poll.html", poll_tags=poll_tags)
 
     if request.method == "POST":
         poll_title = request.form.get("poll-title")
@@ -46,15 +49,33 @@ def create_poll():
                 break
 
         unlisted = True if request.form.get("unlisted") else False
+        anonymous = True if request.form.get("anonymous") else False
+
+        db = current_app.config["db"]
+
+        tag_primary = request.form.get("poll-tag-primary")
+        tag_secondary = request.form.get("poll-tag-secondary")
+        tag_third = request.form.get("poll-tag-third")
+
+        tags = []
+
+        if tag_primary != "0":
+            tags.append(db.session.get(PollTag, tag_primary))
+        if tag_secondary != "0":
+            tags.append(db.session.get(PollTag, tag_secondary))
+        if tag_third != "0":
+            tags.append(db.session.get(PollTag, tag_third))
+
+        print(tags)
 
         new_poll = Poll(
             user_id=int(current_user.get_id()),
             name=poll_title,
             answers=answers,
-            is_unlisted=unlisted
+            is_unlisted=unlisted,
+            tags=tags,
         )
 
-        db = current_app.config["db"]
         db.session.add(new_poll)
         db.session.commit()
 
@@ -62,14 +83,16 @@ def create_poll():
             "You've successfully created your new poll!",
             "success",
         )
-        return redirect(url_for("polls.poll_results", hashed_poll_id=new_poll.hashed_id))
+        return redirect(
+            url_for("polls.poll_results", hashed_poll_id=new_poll.hashed_id)
+        )
 
 
 @polls.route("/poll/<string:hashed_poll_id>/results", methods=["GET"])
 def poll_results(hashed_poll_id: str):
     """Route for displaying the results of a poll."""
     db = current_app.config["db"]
-    
+
     poll_id = decode_url_identifier(hashed_poll_id)
 
     poll = db.session.get(Poll, poll_id)
@@ -98,10 +121,7 @@ def poll_vote(hashed_poll_id: str):
         return redirect(url_for("polls.poll_results", hashed_poll_id=hashed_poll_id))
 
     if request.method == "GET":
-        return render_template(
-            "poll.html",
-            poll=poll
-        )
+        return render_template("poll.html", poll=poll)
 
     if request.method == "POST":
         voted_answer_index = int(request.form.get("poll-answer"))
@@ -136,7 +156,7 @@ def delete_poll():
     if current_user.is_anonymous:
         flash("You have to be logged in to delete a poll", "warning")
         return redirect(url_for("auth.login"))
-    
+
     poll_hashed_id = request.form.get("poll-id")
     poll_id = decode_url_identifier(poll_hashed_id)
 
@@ -159,12 +179,12 @@ def delete_poll():
 
 
 @polls.route("/poll/<string:hashed_poll_id>/edit", methods=["POST"])
-def edit_poll(hashed_poll_id : str):
+def edit_poll(hashed_poll_id: str):
     """Route for editing a poll."""
     if current_user.is_anonymous:
         flash("You have to be logged in to edit a poll", "warning")
         return redirect(url_for("auth.login"))
-    
+
     poll_id = decode_url_identifier(hashed_poll_id)
 
     db = current_app.config["db"]
@@ -183,3 +203,4 @@ def edit_poll(hashed_poll_id : str):
         "success",
     )
     return redirect(url_for("polls.poll_results", hashed_poll_id=poll.hashed_id))
+

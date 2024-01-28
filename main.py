@@ -1,10 +1,11 @@
-from flask import Blueprint, current_app, render_template, redirect, url_for
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
 
 main = Blueprint("main", __name__)
 from sqlalchemy import select
 
 from .models import Poll
+from .models import PollTag
 
 
 @main.route("/")
@@ -24,6 +25,22 @@ def polls_page(page: int = 1):
         return redirect(url_for("main.home"))
 
     return render_template("index.html", polls=polls)
+
+
+@main.route("/tag/<string:tag_id>/", methods=["GET"])
+def get_polls_by_tag(tag_id: int):
+    """Route for displaying all polls with a given tag."""
+    db = current_app.config["db"]
+
+    
+    tag = db.session.get(PollTag, tag_id)
+
+    if not tag:
+        flash("This tag does not exist", "warning")
+        return redirect(url_for("main.home"))
+
+
+    return render_template("polls_tag.html", tag=tag)
 
 
 @main.route("/profile")

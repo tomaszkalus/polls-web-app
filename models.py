@@ -24,6 +24,13 @@ users_answers_assoc = Table(
     Column("answer_id", ForeignKey("answer.id"), primary_key=True),
 )
 
+poll_tag_assoc = Table(
+    "poll_tag_assoc",
+    Base.metadata,
+    Column("poll_id", ForeignKey("poll.id"), primary_key=True),
+    Column("tag_id", ForeignKey("poll_tag.id"), primary_key=True),
+)
+
 
 class User(UserMixin, db.Model):
     __tablename__ = "user"
@@ -57,6 +64,12 @@ class User(UserMixin, db.Model):
         """Returns True if the user has voted in the poll, False otherwise"""
         return poll in self.voted_polls
 
+class PollTag(db.Model):
+    __tablename__ = "poll_tag"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(db.String(64), nullable=False)
+    polls: Mapped[List["Poll"]] = relationship(secondary="poll_tag_assoc", back_populates="tags")
+
 
 class Poll(db.Model):
     __tablename__ = "poll"
@@ -71,6 +84,7 @@ class Poll(db.Model):
     created: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.now(), nullable=False
     )
+    tags: Mapped[List["PollTag"]] = relationship(secondary="poll_tag_assoc", back_populates="polls")
 
     @property
     def total_number_of_votes(self) -> int:

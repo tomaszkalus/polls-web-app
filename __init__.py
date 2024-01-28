@@ -1,10 +1,13 @@
-from flask import Flask, g
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 import os
 
+from flask import Flask, g
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
 
-def create_app():
+
+def create_app() -> Flask:
+    """ Factory function for creating the Flask application"""
+
     app = Flask(__name__)
 
     db_username = os.environ.get("db_username")

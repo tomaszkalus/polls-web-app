@@ -2,6 +2,12 @@
 
 <div class="card mt-3 rounded-0 border-0 bg-light">
     <div class="card-body">
+
+        <div>
+        {% for tag in poll.tags %}
+            <a href="{{ url_for("main.get_polls_by_tag", tag_id=tag.id)}}"><span class="badge bg-secondary">#{{ tag.name }}</span></a>
+        {% endfor %}   
+    </div>
         
         <a class="text-decoration-none text-body fs-5" href="{{ url_for('polls.poll_vote', hashed_poll_id=poll.hashed_id) }}">{{poll.name}}</a>
         
@@ -9,9 +15,6 @@
             <span class=""><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
             <span>•</span>
             <span>by {{poll.author.username}}</span>
-
-
-
         </div>
         
     </div>

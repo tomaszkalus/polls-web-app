@@ -1,23 +1,19 @@
 {% extends "layout.html" %}
-{% set active_page = "index" %}
 
 {% block content %}
 
 {% import 'macros/poll_home_page_card.html' as card %}
 {% import 'macros/pagination.html' as pagination %}
 
-<p class="fs-1 mb-4">Explore latest polls</p>
-
+<a href="{{ url_for("main.home") }}" class="text-decoration-none"><i class="fas fa-arrow-left"></i> Go back to the main page</a>
+<p class="fs-1 mb-4">Polls tagged with: {{ tag.name }}</p>
 
 <div id="polls-container" class="mb-5">
-
-    {% for poll in polls %}
-    {{ card.home_page_poll_card(poll) }}
+    
+    {% for poll in tag.polls %}
+        {{ card.home_page_poll_card(poll) }}
     {% endfor %}
 </div>
-
-{{ pagination.render_pagination(polls, "main.polls_page") }}
-
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script async>
