@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, Response
+from flask import Blueprint, current_app, Response, render_template_string
 
 api = Blueprint("api", __name__)
 from .models import Poll
@@ -9,6 +9,7 @@ import io
 
 @api.route("/api/<string:hashed_poll_id>/results", methods=["GET"])
 def poll_results(hashed_poll_id: str):
+    """ Returns the poll results in a format that can be used by the chart.js library"""
     poll_id = decode_url_identifier(hashed_poll_id)
     db = current_app.config["db"]
 
@@ -21,6 +22,7 @@ def poll_results(hashed_poll_id: str):
 
 @api.route("/api/<string:hashed_poll_id>/csv", methods=["GET"])
 def poll_csv(hashed_poll_id: str):
+    """ Returns a CSV file with the poll results """
     poll_id = decode_url_identifier(hashed_poll_id)
     db = current_app.config["db"]
     poll = db.session.get(Poll, poll_id)
@@ -47,3 +49,31 @@ def poll_csv(hashed_poll_id: str):
         mimetype="text/csv",
         headers={"Content-disposition": f"attachment; filename={file_name}.csv"},
     )
+
+@api.route("/api/<string:hashed_poll_id>/edit", methods=["GET"])
+def get_poll_edit_modal(hashed_poll_id: str):
+    """ Returns the poll edit modal """
+    poll_id = decode_url_identifier(hashed_poll_id)
+    db = current_app.config["db"]
+    poll = db.session.get(Poll, poll_id)
+    
+    edit_modal = render_template_string(
+        "{% import 'macros/edit_poll_modal.html' as edit_macro %}"
+        "{{ edit_macro.render_edit_modal(poll) }}",
+        poll=poll)
+    
+    return edit_modal
+
+@api.route("/api/<string:hashed_poll_id>/delete", methods=["GET"])
+def get_poll_delete_modal(hashed_poll_id: str):
+    """ Returns the poll delete modal """
+    poll_id = decode_url_identifier(hashed_poll_id)
+    db = current_app.config["db"]
+    poll = db.session.get(Poll, poll_id)
+    
+    delete_modal = render_template_string(
+        "{% import 'macros/delete_poll_modal.html' as delete_macro %}"
+        "{{ delete_macro.render_delete_modal(poll) }}",
+        poll=poll)
+    
+    return delete_modal

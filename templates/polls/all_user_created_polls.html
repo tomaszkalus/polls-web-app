@@ -6,34 +6,132 @@ Polls - Your polls
 
 {% block content %}
 
-<h1 class="mb-2">Your polls</h1>
-<h5 class="mb-4">You've created {{ polls|length }} poll(s)</h5>
+{% import 'macros/pagination.html' as pagination %}
+{% import 'macros/delete_poll_modal.html' as modal %}
+{% import 'macros/edit_poll_modal.html' as edit_modal %}
 
-<p class="fs-6 mb-4"></p>
+<h1 class="mb-4">Your polls</h1>
+{% for poll in polls %}
 
-{% if polls|length %}
-    <ul class="list-group mb-2">
-        {% for poll in polls %}
-        <li class="list-group-item">
-            <a href="{{ url_for('polls.poll_results', hashed_poll_id=poll.hashed_id) }}">{{poll.name}}</a>
-            <div class="mt-1">
-                <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
+<div class="card mt-3 rounded-0 border-0 bg-light">
+    <div class="card-body">
+        <div>
+            {% for tag in poll.tags %}
+            <a href="{{ url_for("main.get_polls_by_tag", tag_id=tag.id)}}"><span class="badge bg-secondary">#{{
+                    tag.name }}</span></a>
+            {% endfor %}
+        </div>
 
-                {% if poll.is_unlisted %}
-                <span><i class="fas fa-unlock me-1"></i>Unlisted</span>
-                {% else %}
-                <span><i class="fas fa-eye me-1"></i>Public</span>
-                {% endif %}
+        <a class="text-decoration-none text-body fs-5"
+            href="{{ url_for('polls.poll_vote', hashed_poll_id=poll.hashed_id) }}">{{poll.name}}</a>
+        <div class="text-secondary">{{ poll.created.strftime('%Y-%m-%d') }}</div>
 
-                <a class="ms-2" href=""><i class="fas fa-edit me-1"></i>Edit poll</a>
-                <a class="ms-2 text-danger" href=""><i class="fas fa-trash me-1"></i>Delete poll</a>
-                
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p class="fst-italic">You haven't created any poll yet.</p>
-{% endif %}
+        <div class="d-flex flex-wrap align-items-center">
+            <span class="me-2"><i class="fas fa-poll me-1"></i>{{ poll.total_number_of_votes }} votes</span>
+
+            {% if poll.is_unlisted %}
+            <span><i class="fas fa-unlock me-1"></i>Unlisted</span>
+            {% else %}
+            <span class="ms-2"><i class="fas fa-eye me-1"></i>Public</span>
+            {% endif %}
+
+            <button id="edit-{{ poll.hashed_id }}" class="btn btn-link ms-2"><i class="fas fa-edit me-1"></i>Edit
+                poll</button>
+
+            <button id="delete-{{ poll.hashed_id }}" class="btn btn-link text-danger"><i
+                    class="fas fa-trash me-1"></i>Delete
+                poll</button>
+        </div>
+
+    </div>
+    <div class="poll-results-chart" data-poll-id="{{ poll.hashed_id }}"></div>
+</div>
+
+
+
+{% endfor %}
+
+
+<div id="editModalBody"></div>
+<div id="deleteModalBody"></div>
+
+{{ pagination.render_pagination(polls, "polls.user_created_polls") }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll("button[id^='edit-']");
+        buttons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const hashed_poll_id = this.id.split('-')[1];
+                fetch("/api/" + hashed_poll_id + "/edit")
+                    .then(response => response.text())
+                    .then(data => {
+                        const modalBody = document.getElementById('editModalBody');
+                        modalBody.innerHTML = data;
+                        document.createElement('div').innerHTML = data;
+                        const modalElement = document.getElementById('edit-poll-modal');
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.handleUpdate();
+                        modal.show();
+
+                        const form = modalBody.querySelector('form');
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+
+                            fetch(form.action, {
+                                method: form.method,
+                                body: new FormData(form)
+                            })
+                                .then(response => {
+                                    if (response.ok) {
+                                        location.reload();
+                                    } else {
+                                        alert('Error: ' + response.statusText);
+                                    }
+                                });
+                        });
+                    });
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll("button[id^='delete-']");
+        buttons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const hashed_poll_id = this.id.split('-')[1];
+                fetch("/api/" + hashed_poll_id + "/delete")
+                    .then(response => response.text())
+                    .then(data => {
+                        const modalBody = document.getElementById('deleteModalBody');
+                        modalBody.innerHTML = data;
+                        document.createElement('div').innerHTML = data;
+                        const modalElement = document.getElementById('delete-poll-modal');
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.handleUpdate();
+                        modal.show();
+
+                        const form = modalBody.querySelector('form');
+                        form.addEventListener('submit', function (event) {
+                            event.preventDefault();
+
+                            fetch(form.action, {
+                                method: form.method,
+                                body: new FormData(form)
+                            })
+                                .then(response => {
+                                    if (response.ok) {
+                                        location.reload();
+                                    } else {
+                                        alert('Error: ' + response.statusText);
+                                    }
+                                });
+                        });
+                    });
+            });
+        });
+    });
+
+</script>
 
 {% endblock %}

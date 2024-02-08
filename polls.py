@@ -14,6 +14,7 @@ from flask_login import current_user
 from .models import Answer
 from .models import Poll
 from .models import PollTag
+from .models import users_answers_assoc
 from .utils import decode_url_identifier
 
 polls = Blueprint("polls", __name__, template_folder="templates/polls")
@@ -136,18 +137,30 @@ def poll_vote(hashed_poll_id: str):
         return redirect(url_for("polls.poll_results", hashed_poll_id=hashed_poll_id))
 
 
-@polls.route("/your_polls/", methods=["GET"])
-def user_created_polls():
+
+@polls.route("/your_polls/<int:page>", defaults={"page": 1})
+@polls.route("/your_polls/<int:page>")
+def user_voted_polls(page: int = 1):
     """Route for displaying all the polls that the user has created."""
     if current_user.is_anonymous:
         flash("You have to be logged in to view your polls", "warning")
         return redirect(url_for("auth.login"))
 
-    if not current_user.polls:
-        flash("You haven't created any polls yet", "warning")
+    if not current_user.voted_polls:
+        flash("You haven't voted in any poll yet", "warning")
         return redirect(url_for("auth.profile"))
+    
+    db = current_app.config["db"]
 
-    return render_template("all_user_created_polls.html", polls=current_user.polls)
+
+
+    voted_polls = db.paginate(db.select(Poll).join(users_answers_assoc, users_answers_assoc.poll.id == Poll.id).filter(users_answers_assoc.user_id == current_user.id).all(), max_per_page=10, page=page, error_out=False)
+    # voted_polls = 
+
+    if not voted_polls or voted_polls.pages == 0 or page > voted_polls.pages:
+        return redirect(url_for("main.home"))
+
+    return render_template("all_user_voted_polls.html", polls=voted_polls)
 
 
 @polls.route("/delete_poll/", methods=["POST"])

@@ -22,11 +22,10 @@
     <button type="button" class="ms-3 px-0 btn btn-link" data-bs-toggle="modal" data-bs-target="#edit-poll-modal"><i
             class="fas fa-edit me-1"></i>Edit poll</button>
 
-    <button type="button" class="ms-3  px-0 btn btn-link text-danger" data-bs-toggle="modal"
+    <button type="button" class="ms-3 px-0 btn btn-link text-danger" data-bs-toggle="modal"
         data-bs-target="#delete-poll-modal"><i class="fas fa-trash me-1"></i>Delete poll</button>
 
-    <button type="button" class="btn btn-primary ms-auto"><i class="fas fa-download me-2"></i>Download results as CSV</button>
-    <!-- TODO -->
+    <a href="{{ url_for("api.poll_csv", hashed_poll_id=poll.hashed_id)}}" class="btn btn-primary ms-auto"><i class="fas fa-download me-2"></i>Download results as CSV</a>
     {% endif %}
 
     
