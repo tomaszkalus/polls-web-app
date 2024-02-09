@@ -1,5 +1,5 @@
-from polls_app.config import MIN_PASSWORD_LENGTH
 from dataclasses import dataclass
+from polls_app.config import MIN_PASSWORD_LENGTH
 
 
 @dataclass

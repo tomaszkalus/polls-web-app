@@ -50,7 +50,6 @@ def create_poll():
                 break
 
         unlisted = True if request.form.get("unlisted") else False
-        anonymous = True if request.form.get("anonymous") else False
 
         db = current_app.config["db"]
 
@@ -137,11 +136,36 @@ def poll_vote(hashed_poll_id: str):
         return redirect(url_for("polls.poll_results", hashed_poll_id=hashed_poll_id))
 
 
-
 @polls.route("/your_polls/<int:page>", defaults={"page": 1})
 @polls.route("/your_polls/<int:page>")
-def user_voted_polls(page: int = 1):
+def user_created_polls(page: int = 1):
     """Route for displaying all the polls that the user has created."""
+    if current_user.is_anonymous:
+        flash("You have to be logged in to view your polls", "warning")
+        return redirect(url_for("auth.login"))
+
+    if not current_user.polls:
+        flash("You haven't created any polls yet", "warning")
+        return redirect(url_for("auth.profile"))
+
+    db = current_app.config["db"]
+    created_polls = db.paginate(
+        db.select(Poll).where(Poll.user_id == current_user.id).order_by(Poll.created.desc()),
+        max_per_page=10,
+        page=page,
+        error_out=False,
+    )
+
+    if not created_polls or created_polls.pages == 0 or page > created_polls.pages:
+        return redirect(url_for("main.home"))
+
+    return render_template("all_user_created_polls.html", polls=created_polls)
+
+
+@polls.route("/your_voted_polls/<int:page>", defaults={"page": 1})
+@polls.route("/your_voted_polls/<int:page>")
+def user_voted_polls(page: int = 1):
+    """Route for displaying all the polls that the user has voted in"""
     if current_user.is_anonymous:
         flash("You have to be logged in to view your polls", "warning")
         return redirect(url_for("auth.login"))
@@ -149,16 +173,19 @@ def user_voted_polls(page: int = 1):
     if not current_user.voted_polls:
         flash("You haven't voted in any poll yet", "warning")
         return redirect(url_for("auth.profile"))
-    
+
     db = current_app.config["db"]
 
-
-
-    voted_polls = db.paginate(db.select(Poll).join(users_answers_assoc, users_answers_assoc.poll.id == Poll.id).filter(users_answers_assoc.user_id == current_user.id).all(), max_per_page=10, page=page, error_out=False)
-    # voted_polls = 
-
-    if not voted_polls or voted_polls.pages == 0 or page > voted_polls.pages:
-        return redirect(url_for("main.home"))
+    voted_polls = db.paginate(
+        db.select(Poll)
+        .join(Poll.answers)
+        .join(users_answers_assoc)
+        .where(users_answers_assoc.c.user_id == current_user.id)
+        .order_by(Poll.created.desc()),
+        max_per_page=10,
+        page=page,
+        error_out=False,
+    )
 
     return render_template("all_user_voted_polls.html", polls=voted_polls)
 
@@ -216,4 +243,3 @@ def edit_poll(hashed_poll_id: str):
         "success",
     )
     return redirect(url_for("polls.poll_results", hashed_poll_id=poll.hashed_id))
-

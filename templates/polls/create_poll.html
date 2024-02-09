@@ -11,9 +11,9 @@ Create a new poll
 <form action="{{ url_for('polls.create_poll') }}" method="post" autocomplete="off">
     <label for="poll-title-input">Poll title:</label>
     <input class="form-control mb-3" type="text" name="poll-title" id="poll-title-input"
-        placeholder="Eg. What's your favourite food?" >
+        placeholder="Eg. What's your favourite food?">
 
-    
+
     <div id="answers-editor">
         <div id="answers-container">
             <div v-for="(answer, index) in pollAnswers">
@@ -22,49 +22,39 @@ Create a new poll
 
             </div>
         </div>
-
-        <!-- <p class="fs-4">Poll options</p> -->
+        
         <h2>Poll options</h2>
-
-        <!-- <h4> Poll tags </h4> -->
         <label for="tag-select-primary" class="form-label">Select a primary tag (optional)</label>
-        <select class="form-select mb-3" id="tag-select-primary" aria-label="Select a primary tag (optional)" name="poll-tag-primary">
-            <option value="0" selected >Select an option...</option>
+        <select class="form-select mb-3" id="tag-select-primary" aria-label="Select a primary tag (optional)"
+            name="poll-tag-primary">
+            <option value="0" selected>Select an option...</option>
             {% for tag in poll_tags %}
-                <option value="{{ tag.id }}">{{ tag.name }}</option>
-            {% endfor %}   
+            <option value="{{ tag.id }}">{{ tag.name }}</option>
+            {% endfor %}
         </select>
 
         <label for="tag-select-secondary" class="form-label">Select a secondary tag (optional)</label>
-        <select class="form-select mb-3" id="tag-select-secondary" aria-label="Select a secondary tag (optional)" name="poll-tag-secondary">
+        <select class="form-select mb-3" id="tag-select-secondary" aria-label="Select a secondary tag (optional)"
+            name="poll-tag-secondary">
             <option value="0" selected value="0">Select an option...</option>
             {% for tag in poll_tags %}
-                <option value="{{ tag.id }}">{{ tag.name }}</option>
-            {% endfor %}   
+            <option value="{{ tag.id }}">{{ tag.name }}</option>
+            {% endfor %}
         </select>
 
         <label for="tag-select-third" class="form-label">Select a third tag (optional)</label>
-        <select class="form-select mb-4" id="tag-select-third" aria-label="Select a third tag (optional)" name="poll-tag-third">
+        <select class="form-select mb-4" id="tag-select-third" aria-label="Select a third tag (optional)"
+            name="poll-tag-third">
             <option value="0" selected value="0">Select an option...</option>
             {% for tag in poll_tags %}
-                <option value="{{ tag.id }}">{{ tag.name }}</option>
-            {% endfor %}   
+            <option value="{{ tag.id }}">{{ tag.name }}</option>
+            {% endfor %}
         </select>
-        
+
         <div class="form-check">
             <input class="form-check-input" id="unlisted-checkbox" type="checkbox" name="unlisted" value="unlisted">
             <label class="form-check-label" for="unlisted-checkbox">Unlisted (available only with a link)</label>
         </div>
-
-        <div class="form-check">
-            <input class="form-check-input" id="anonymous-checkbox" type="checkbox" name="anonymous" value="anonymous">
-            <label class="form-check-label" for="anonymous-checkbox">Create anonymous poll (your username will not be visible)</label>
-        </div>
-
-        
-        
-
-        
 
         <div class="d-flex justify-content-center mt-5">
             <button type="button" @click="addAnswer" class="btn btn-primary px-5 me-5" id="add-new-answer-btn">Add new
@@ -72,13 +62,8 @@ Create a new poll
             <button type="submit" class="btn btn-primary px-5">Create a new poll</button>
         </div>
     </div>
-    
-
-    
 
 </form>
-
-
 
 <script type="module" src="{{url_for('static', filename='pollAnswerInput.js')}}"></script>
 <script type="module" src="{{url_for('static', filename='createPoll.js')}}"></script>

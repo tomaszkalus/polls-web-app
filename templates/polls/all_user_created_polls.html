@@ -10,7 +10,7 @@ Polls - Your polls
 {% import 'macros/delete_poll_modal.html' as modal %}
 {% import 'macros/edit_poll_modal.html' as edit_modal %}
 
-<h1 class="mb-4">Your polls</h1>
+<h1 class="mb-4 fw-normal">Your polls</h1>
 {% for poll in polls %}
 
 <div class="card mt-3 rounded-0 border-0 bg-light">
@@ -35,10 +35,10 @@ Polls - Your polls
             <span class="ms-2"><i class="fas fa-eye me-1"></i>Public</span>
             {% endif %}
 
-            <button id="edit-{{ poll.hashed_id }}" class="btn btn-link ms-2"><i class="fas fa-edit me-1"></i>Edit
+            <button id="edit-{{ poll.hashed_id }}" title="Edit poll" class="btn btn-link"><i class="fas fa-edit me-1"></i>Edit
                 poll</button>
 
-            <button id="delete-{{ poll.hashed_id }}" class="btn btn-link text-danger"><i
+            <button id="delete-{{ poll.hashed_id }}" title="Edit poll" class="btn btn-link text-danger"><i
                     class="fas fa-trash me-1"></i>Delete
                 poll</button>
         </div>

@@ -75,7 +75,7 @@ Polls - Your Profile
         </li>
         {% endfor %}
     </ul>
-    <a class="text-decoration-none text-dark" href="{{ url_for('polls.user_created_polls')}}">Show all</a>
+    <a class="text-decoration-none text-dark" href="{{ url_for('polls.user_voted_polls')}}">Show all</a>
     {% else %}
     <p class="fst-italic">You haven't voted in any poll yet.</p>
     {% endif %}

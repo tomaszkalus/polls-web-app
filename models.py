@@ -10,8 +10,10 @@ from sqlalchemy import Column, DateTime, ForeignKey, Table
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqids import Sqids
 
+
 class Base(DeclarativeBase):
     pass
+
 
 sqids = Sqids(min_length=5)
 
@@ -59,16 +61,19 @@ class User(UserMixin, db.Model):
     def number_of_votes(self) -> int:
         """Returns the number of votes made by the user"""
         return len(self.voted_answers)
-    
+
     def did_vote(self, poll) -> bool:
         """Returns True if the user has voted in the poll, False otherwise"""
         return poll in self.voted_polls
+
 
 class PollTag(db.Model):
     __tablename__ = "poll_tag"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True)
     name: Mapped[str] = mapped_column(db.String(64), nullable=False)
-    polls: Mapped[List["Poll"]] = relationship(secondary="poll_tag_assoc", back_populates="tags")
+    polls: Mapped[List["Poll"]] = relationship(
+        secondary="poll_tag_assoc", back_populates="tags"
+    )
 
 
 class Poll(db.Model):
@@ -84,18 +89,25 @@ class Poll(db.Model):
     created: Mapped[datetime.datetime] = mapped_column(
         DateTime, default=datetime.datetime.now(), nullable=False
     )
-    tags: Mapped[List["PollTag"]] = relationship(secondary="poll_tag_assoc", back_populates="polls")
+    tags: Mapped[List["PollTag"]] = relationship(
+        secondary="poll_tag_assoc", back_populates="polls"
+    )
 
     @property
     def total_number_of_votes(self) -> int:
         """Returns the total number of votes in the poll"""
         return sum(answer.number_of_votes for answer in self.answers)
-    
+
     @property
     def graph_data(self) -> tuple:
         """Returns the poll data in a format that can be used by the chart.js library"""
-        return tuple([(answer.text, answer.number_of_votes, answer.answer_percent) for answer in self.answers])
-    
+        return tuple(
+            [
+                (answer.text, answer.number_of_votes, answer.answer_percent)
+                for answer in self.answers
+            ]
+        )
+
     @property
     def hashed_id(self) -> str:
         """Returns the hash of the poll id"""
