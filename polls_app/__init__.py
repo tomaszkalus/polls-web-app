@@ -13,7 +13,7 @@ def create_app() -> Flask:
     db_username = os.environ.get("db_username")
     db_password = os.environ.get("db_password")
 
-    app.config["SECRET_KEY"] = "secret-key-goes-here"
+    app.config["SECRET_KEY"] = os.environ.get("secret_key")
     app.config[
         "SQLALCHEMY_DATABASE_URI"
     ] = f"mysql+pymysql://{db_username}:{db_password}@127.0.0.1/polls"

@@ -1,5 +1,8 @@
 __pycache__/
 TODO
-.venv/
+venv/
 .vscode/
 .idea/
+/polls_app/__pycache__/
+/polls_app/.vscode/
+/polls_app/tests
