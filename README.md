@@ -20,7 +20,7 @@ A web app for creating and voting in polls made with Flask.
 ## Live Demo
 
 The app is publicly hosted on PythonAnywhere under here:
-http://flaskpollsapp.eu.pythonanywhere.com/profile
+http://flaskpollsapp.eu.pythonanywhere.com
 
 
 ## Screenshots
