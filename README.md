@@ -11,15 +11,22 @@ A web app for creating and voting in polls made with Flask.
 - Data visualization for polls results
 - Responsive layout for every screen size
 
-
-## Screenshots
-
-![App Screenshot](https://i.imgur.com/BMBxdJ2.jpeg)
-
-
 ## Tech Stack
 
 **Client:** JavaScript, Vue.js, Bootstrap 5
 
 **Server:** Python, Flask, MySQL, Flask-SQLAlchemy, Flask-Login
+
+## Live Demo
+
+The app is publicly hosted on PythonAnywhere under here:
+http://flaskpollsapp.eu.pythonanywhere.com/profile
+
+
+## Screenshots
+
+![App Screenshot 1](https://i.imgur.com/OvNqPNX.jpeg)
+![App Screenshot 2](https://i.imgur.com/YzM5bnk.jpeg)
+![App Screenshot 3](https://i.imgur.com/2tAwbqB.jpeg)
+
 
