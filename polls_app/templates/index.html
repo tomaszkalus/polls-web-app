@@ -7,62 +7,15 @@
 {% import 'macros/pagination.html' as pagination %}
 
 <h1 class="mb-4 fw-normal">Explore latest polls</h1>
-
-
 <div id="polls-container">
 
     {% for poll in polls %}
     {{ card.home_page_poll_card(poll) }}
     {% endfor %}
 </div>
-
 {{ pagination.render_pagination(polls, "main.polls_page") }}
 
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script async>
-
-
-    async function getPollResults(pollId) {
-        const response = await fetch(`/api/${pollId}/results`).then(response => response.json())
-        return response
-    }
-
-    const polls = document.querySelectorAll('.poll-results-chart');
-    polls.forEach((poll, index) => {
-        const pollId = poll.dataset.pollId;
-        getPollResults(pollId).then(data => {
-            const pollVotes = data.map(subList => subList[1]);
-            const bar = customBarFactory(pollVotes);
-            poll.appendChild(bar);
-
-        })
-    });
-
-    const customBarFactory = (poll_values) => {
-
-        const barSegmentColors = ['#36a2eb', '#ff6384', '#4bc0c0', '#ff9f40', '#ffcd56', '#c9cbcf', '#8a80b1', '#ffa07a']
-        const bar = document.createElement('div');
-        const totalVotesCount = poll_values.reduce((acc, curr) => acc + curr);
-
-        bar.classList.add('custom-bar');
-        for (let i = 0; i < poll_values.length; i++) {
-            const barSegment = document.createElement('div');
-            let barSegmentWidth;
-            if (totalVotesCount === 0) {
-                barSegmentWidth = 0;
-            } else {
-                barSegmentWidth = (poll_values[i] / totalVotesCount) * 100;
-            }
-
-            barSegment.classList.add('bar-segment');
-            barSegment.style.width = `${barSegmentWidth}%`;
-            barSegment.style.backgroundColor = barSegmentColors[i];
-            bar.appendChild(barSegment);
-        }
-        return bar;
-    }
-
-</script>
+<script src="{{url_for('static', filename='pollBarChartPreview.js')}}"></script>
 
 {% endblock %}

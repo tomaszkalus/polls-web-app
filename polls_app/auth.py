@@ -15,6 +15,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .models import User
 from .validation import validate_password
 
+from .config import TEST_USERNAME, TEST_PASSWORD
+
 auth = Blueprint("auth", __name__, template_folder="templates/auth")
 app = current_app
 
@@ -33,6 +35,10 @@ def login_post():
 
     remember = True if request.form.get("remember") else False
 
+    if request.form.get("guest"):
+        username = TEST_USERNAME
+        password = TEST_PASSWORD
+    
     user = User.query.filter_by(username=username).first()
 
     if not user or not check_password_hash(user.password, password):
@@ -42,6 +48,25 @@ def login_post():
     login_user(user, remember=remember)
     flash("You are successfully logged in.", "success")
     return redirect(url_for("main.profile"))
+
+@auth.route('/login_guest', methods=["POST"])
+def login_guest():
+    """ Login handler for guest user. """
+
+    username = TEST_USERNAME
+    password = TEST_PASSWORD
+
+    remember = True if request.form.get("remember") else False
+
+    user = User.query.filter_by(username=username).first()
+
+    if not user or not check_password_hash(user.password, password):
+        flash("The guest account is not working. Please try again later or create an account.", "danger")
+        return redirect(url_for("auth.login"))
+
+    login_user(user, remember=remember)
+    flash("You are successfully logged in as a guest.", "success")
+    return redirect(url_for("main.index"))
 
 
 @auth.route("/register/")

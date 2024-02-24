@@ -14,6 +14,7 @@ def create_app() -> Flask:
     db_password = os.environ.get("db_password")
 
     app.config["SECRET_KEY"] = os.environ.get("secret_key")
+    
     app.config[
         "SQLALCHEMY_DATABASE_URI"
     ] = f"mysql+pymysql://{db_username}:{db_password}@127.0.0.1/polls"
@@ -21,6 +22,8 @@ def create_app() -> Flask:
 
     from polls_app.models import db
 
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle' : 280}
+    
     db.init_app(app)
     app.config["db"] = db
 

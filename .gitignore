@@ -6,3 +6,4 @@ venv/
 /polls_app/__pycache__/
 /polls_app/.vscode/
 /polls_app/tests
+wsgi.py
