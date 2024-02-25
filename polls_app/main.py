@@ -9,7 +9,7 @@ from .models import PollTag
 
 @main.route("/")
 def home():
-    
+
     return polls_page(1)
 
 @main.route('/page/<int:page>', defaults={'page': 1})
@@ -20,7 +20,7 @@ def polls_page(page: int = 1):
 
     polls = db.paginate(db.select(Poll).where(Poll.is_unlisted == False).order_by(Poll.created.desc()), max_per_page=10, page=page, error_out=False)
 
-    if not polls or polls.pages == 0 or page > polls.pages:
+    if page > polls.pages and polls.pages > 0:
         return redirect(url_for("main.home"))
 
     return render_template("index.html", polls=polls)
@@ -31,7 +31,7 @@ def get_polls_by_tag(tag_id: int):
     """Route for displaying all polls with a given tag."""
     db = current_app.config["db"]
 
-    
+
     tag = db.session.get(PollTag, tag_id)
 
     if not tag:

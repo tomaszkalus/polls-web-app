@@ -10,16 +10,18 @@ def create_app() -> Flask:
 
     app = Flask(__name__)
 
-    db_username = os.environ.get("db_username")
-    db_password = os.environ.get("db_password")
+    db_username = os.getenv("db_username")
+    db_password = os.getenv("db_password")
+    app.config["SECRET_KEY"] = os.getenv("secret_key")
 
-    app.config["SECRET_KEY"] = os.environ.get("secret_key")
     app.config[
         "SQLALCHEMY_DATABASE_URI"
-    ] = f"mysql+pymysql://{db_username}:{db_password}@127.0.0.1/polls"
+    ] = f"mysql+pymysql://{db_username}:{db_password}@flaskpollsapp.mysql.eu.pythonanywhere-services.com/flaskpollsapp$polls"
     app.config["TEMPLATES_AUTO_RELOAD"] = True
 
     from polls_app.models import db
+
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle' : 280}
 
     db.init_app(app)
     app.config["db"] = db
@@ -54,3 +56,5 @@ def create_app() -> Flask:
         db.create_all()
 
     return app
+
+app = create_app()
