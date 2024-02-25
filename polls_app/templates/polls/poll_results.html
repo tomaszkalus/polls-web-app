@@ -27,16 +27,14 @@
 
     <a href="{{ url_for("api.poll_csv", hashed_poll_id=poll.hashed_id)}}" class="btn btn-primary ms-auto"><i class="fas fa-download me-2"></i>Download results as CSV</a>
     {% endif %}
-
-    
 </div>
 
 <div class="mb-4">
     {% for answer in poll.answers %}
-    <p class="mb-2" id="answer-{{ loop.index }}">{{ answer.text }} - {{ answer.answer_percent }}%
+    <p class="mb-2" id="answer-{{ loop.index }}">{{ answer.text }} - {{ "%.1f"|format(answer.answer_percent) }}%
         ({{answer.number_of_votes }} votes)</p>
     <div class="progress mb-3" role="progressbar" style="height:20px">
-        <div class="progress-bar" style="width: {{answer.answer_percent}}%">{{answer.answer_percent}}%</div>
+        <div class="progress-bar" style="width: {{answer.answer_percent}}%">{{ "%.1f"|format(answer.answer_percent) }}%</div>
     </div>
     {% endfor %}
 </div>
@@ -51,55 +49,16 @@
     {% endif %}
 </div>
 
-<div class="mt-5 d-flex justify-content-center">
-    <div class="w-50">
-        <canvas id="poll-results"></canvas>
+<div class="mt-5 d-flex justify-content-center container">
+    <div class="col-md-6 col-12">
+        <canvas id="poll-results" data-poll-id="{{ poll.hashed_id }}"></canvas>
     </div>
 </div>
 
 {{ modal.render_delete_modal(poll) }}
 {{ edit_modal.render_edit_modal(poll) }}
 
-
+<script src="{{url_for('static', filename='pollPieChartGenerate.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-
-    const poll_results = {{ poll_answers | tojson }};
-
-    const pollAnswers = poll_results.map(subList => subList[0]);
-    const pollVotes = poll_results.map(subList => subList[1]);
-    const pollPercentages = poll_results.map(subList => subList[2]);
-
-    const ctx = document.getElementById('poll-results');
-
-    const chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: pollAnswers,
-            datasets: [{
-                label: '# of Votes',
-                data: pollVotes,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    const chart_colors = chart.data.datasets[0].backgroundColor
-    const progressBars = document.querySelectorAll('.progress-bar');
-    for (let i = 0; i < progressBars.length; i++) {
-        progressBars[i].style.backgroundColor = chart_colors[i];
-    }
-
-</script>
-
-
-
 
 {% endblock %}

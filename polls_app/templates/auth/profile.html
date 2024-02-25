@@ -12,25 +12,20 @@ Polls - Your Profile
 <div class="col-md-6 mb-5">
     <h4>Profile information:</h4>
     <table class="table">
-
         <tr>
             <td>Joined:</td>
             <td>{{ user.join_date.strftime('%d.%m.%Y') }}</td>
         </tr>
-
         <tr>
             <td>Polls created:</td>
             <td>{{ user.number_of_polls_created}}</td>
         </tr>
-
         <tr>
             <td>Vote count:</td>
             <td>{{ user.number_of_votes }}</td>
         </tr>
-
     </table>
 </div>
-
 
 <div class="mb-3">
     <h4>Your polls:</h4>
@@ -46,7 +41,6 @@ Polls - Your Profile
                 {% else %}
                 <span><i class="fas fa-eye me-1"></i>Public</span>
                 {% endif %}
-
             </div>
         </li>
         {% endfor %}
@@ -55,14 +49,10 @@ Polls - Your Profile
     {% else %}
     <p class="fst-italic">You haven't created any poll yet.</p>
     {% endif %}
-
-
 </div>
 
 <div class="mb-5">
     <h4>Polls you've voted in:</h4>
-
-
     {% if user.voted_polls|length %}
     <ul class="list-group mb-2">
         {% for poll in user.voted_polls[:3] %}
@@ -79,16 +69,13 @@ Polls - Your Profile
     {% else %}
     <p class="fst-italic">You haven't voted in any poll yet.</p>
     {% endif %}
-
-
-
-
 </div>
 
+{% if user.username != 'Guest' %}
 <div class="row gy-2 gx-0 mb-5">
-
     <a href="{{ url_for('auth.change_password') }}" class="btn btn-primary col-md-2">Change password</a>
     <a href="{{ url_for('auth.delete_account') }}" class="btn btn-danger col-md-2 mx-md-2">Delete account</a>
 </div>
+{% endif %}
 
 {% endblock %}

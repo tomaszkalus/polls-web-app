@@ -22,7 +22,6 @@ def create_app() -> Flask:
     from polls_app.models import db
 
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle' : 280}
-
     db.init_app(app)
     app.config["db"] = db
 

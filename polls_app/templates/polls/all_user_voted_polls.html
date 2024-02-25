@@ -21,7 +21,6 @@ Polls - Your voted polls
                     tag.name }}</span></a>
             {% endfor %}
         </div>
-
         <a class="text-decoration-none text-body fs-5"
             href="{{ url_for('polls.poll_vote', hashed_poll_id=poll.hashed_id) }}">{{poll.name}}</a>
         <div class="text-secondary">{{poll.author.username}} • {{ poll.created.strftime('%Y-%m-%d') }} </div>
@@ -33,19 +32,10 @@ Polls - Your voted polls
             {% else %}
             <span class="ms-2"><i class="fas fa-eye me-1"></i>Public</span>
             {% endif %}
-            
-
         </div>
-
     </div>
     <div class="poll-results-chart" data-poll-id="{{ poll.hashed_id }}"></div>
 </div>
 
-
-
 {% endfor %}
-
-
-
-
 {% endblock %}
